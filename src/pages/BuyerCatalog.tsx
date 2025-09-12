@@ -69,6 +69,7 @@ const BuyerCatalog = () => {
     const storedCreators = localStorage.getItem('stockless_creators');
     const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
 
+    
     for (const creator of allCreators) {
       const found = creator.gallery.find(
         (item: any) =>

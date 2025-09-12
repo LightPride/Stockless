@@ -14,20 +14,21 @@ import ContractModal from '@/components/ContractModal';
 const CreatorDashboard = () => {
   const { id } = useParams<{ id: string }>();
   const { user, logout } = useAuth();
+  const [dataVersion, setDataVersion] = useState(0);
   
   // Find creator data from localStorage or mock data
   const creator = useMemo(() => {
     const storedCreators = localStorage.getItem('stockless_creators');
     const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
     return allCreators.find((c: any) => c.id === id) || allCreators[0];
-  }, [id]);
+  }, [id, dataVersion]);
 
   // Get requests for this creator
   const creatorRequests = useMemo(() => {
     const storedRequests = localStorage.getItem('stockless_requests');
     const allRequests = storedRequests ? JSON.parse(storedRequests) : mockRequests;
     return allRequests.filter((req: any) => req.creatorId === creator.id);
-  }, [creator.id]);
+  }, [creator.id, dataVersion]);
 
   // Profile editing state
   const [isEditing, setIsEditing] = useState(false);
@@ -41,9 +42,31 @@ const CreatorDashboard = () => {
   const [showContractModal, setShowContractModal] = useState(false);
 
   const handleSaveProfile = () => {
-    // In real app, this would save to the database
-    console.log('Saving profile:', editedProfile);
+    // Persist edits to mock DB (localStorage)
+    const storedCreators = localStorage.getItem('stockless_creators');
+    const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
+    const idx = allCreators.findIndex((c: any) => c.id === creator.id);
+    if (idx !== -1) {
+      allCreators[idx] = {
+        ...allCreators[idx],
+        name: editedProfile.name,
+        tags: editedProfile.tags,
+        restrictions: editedProfile.restrictions,
+      };
+      localStorage.setItem('stockless_creators', JSON.stringify(allCreators));
+    }
+
+    // Keep users table in sync for header display/name
+    const storedUsers = localStorage.getItem('stockless_users');
+    const allUsers = storedUsers ? JSON.parse(storedUsers) : [];
+    const uIdx = allUsers.findIndex((u: any) => u.id === creator.id);
+    if (uIdx !== -1) {
+      allUsers[uIdx] = { ...allUsers[uIdx], name: editedProfile.name };
+      localStorage.setItem('stockless_users', JSON.stringify(allUsers));
+    }
+
     setIsEditing(false);
+    setDataVersion((v) => v + 1);
   };
 
   const handleCancelEdit = () => {
@@ -101,16 +124,29 @@ const CreatorDashboard = () => {
     if (!creator.contractSigned) {
       setShowContractModal(true);
     } else {
-      // Handle actual social media connection
-      console.log('Connecting social media...');
+      // Persist connection status to mock DB (localStorage)
+      const storedCreators = localStorage.getItem('stockless_creators');
+      const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
+      const idx = allCreators.findIndex((c: any) => c.id === creator.id);
+      if (idx !== -1) {
+        allCreators[idx] = { ...allCreators[idx], socialMediaConnected: true };
+        localStorage.setItem('stockless_creators', JSON.stringify(allCreators));
+      }
+      setDataVersion((v) => v + 1);
     }
   };
 
   const handleSignContract = () => {
-    // In real app, this would update the database
-    console.log('Contract signed for:', creator.name);
+    // Update contractSigned in mock DB (localStorage)
+    const storedCreators = localStorage.getItem('stockless_creators');
+    const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
+    const idx = allCreators.findIndex((c: any) => c.id === creator.id);
+    if (idx !== -1) {
+      allCreators[idx] = { ...allCreators[idx], contractSigned: true };
+      localStorage.setItem('stockless_creators', JSON.stringify(allCreators));
+    }
     setShowContractModal(false);
-    // Mock updating the creator's contract status
+    setDataVersion((v) => v + 1);
   };
 
   return (

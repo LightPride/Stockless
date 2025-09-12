@@ -73,21 +73,27 @@ const Login = () => {
       }
       
       if (success) {
-        const user = isRegister ? 
-          { id: selectedRole + Date.now(), email, role: selectedRole, name } : 
-          null;
-          
+        // Decode token to get the authenticated user's id and role
+        const token = localStorage.getItem('stockless_access_token');
+        let targetRole = selectedRole;
+        let targetId: string | null = null;
+        if (token) {
+          try {
+            const payload = JSON.parse(atob(token));
+            targetRole = payload.role;
+            targetId = payload.sub;
+          } catch {}
+        }
+
         toast({
           title: isRegister ? 'Account created!' : 'Welcome back!',
           description: isRegister ? 'Registration successful' : 'Login successful',
         });
         
-        if (selectedRole === 'buyer') {
+        if (targetRole === 'buyer') {
           navigate('/buyers');
         } else {
-          // For newly registered creators, use their new ID
-          const creatorId = user?.id || 'creator1';
-          navigate(`/creator-dashboard/${creatorId}`);
+          navigate(`/creator-dashboard/${targetId || 'creator1'}`);
         }
       } else {
         toast({
