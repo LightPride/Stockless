@@ -15,14 +15,18 @@ const CreatorDashboard = () => {
   const { id } = useParams<{ id: string }>();
   const { user, logout } = useAuth();
   
-  // Find creator data
+  // Find creator data from localStorage or mock data
   const creator = useMemo(() => {
-    return mockCreators.find(c => c.id === id) || mockCreators[0];
+    const storedCreators = localStorage.getItem('stockless_creators');
+    const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
+    return allCreators.find((c: any) => c.id === id) || allCreators[0];
   }, [id]);
 
   // Get requests for this creator
   const creatorRequests = useMemo(() => {
-    return mockRequests.filter(req => req.creatorId === creator.id);
+    const storedRequests = localStorage.getItem('stockless_requests');
+    const allRequests = storedRequests ? JSON.parse(storedRequests) : mockRequests;
+    return allRequests.filter((req: any) => req.creatorId === creator.id);
   }, [creator.id]);
 
   // Profile editing state

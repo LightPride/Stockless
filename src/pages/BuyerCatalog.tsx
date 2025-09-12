@@ -16,19 +16,30 @@ const BuyerCatalog = () => {
 
   // Get all unique tags from creators
   const allTags = useMemo(() => {
+    const storedCreators = localStorage.getItem('stockless_creators');
+    const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
     const tags = new Set<string>();
-    mockCreators.forEach(creator => {
-      creator.tags.forEach(tag => tags.add(tag));
+    allCreators.forEach((creator: any) => {
+      creator.tags.forEach((tag: string) => tags.add(tag));
     });
     return Array.from(tags);
   }, []);
 
   // Filter creators based on search and tags
   const filteredCreators = useMemo(() => {
-    return mockCreators.filter(creator => {
+    // Get creators from localStorage if available, otherwise use mock data
+    const storedCreators = localStorage.getItem('stockless_creators');
+    const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
+    
+    return allCreators.filter((creator: any) => {
+      // Only show creators who have signed contract and connected social media
+      if (!creator.contractSigned || !creator.socialMediaConnected) {
+        return false;
+      }
+      
       const matchesSearch = creator.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesTags = selectedTags.length === 0 || 
-        selectedTags.some(tag => creator.tags.includes(tag));
+        selectedTags.some((tag: string) => creator.tags.includes(tag));
       
       return matchesSearch && matchesTags;
     });
@@ -55,10 +66,12 @@ const BuyerCatalog = () => {
     if (!isInstagramUrl) return;
 
     const normalized = url.replace(/\/?$/, '');
+    const storedCreators = localStorage.getItem('stockless_creators');
+    const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
 
-    for (const creator of mockCreators) {
+    for (const creator of allCreators) {
       const found = creator.gallery.find(
-        (item) =>
+        (item: any) =>
           item.permalink.replace(/\/?$/, '') === normalized ||
           normalized.includes(item.permalink.replace(/\/?$/, '')) ||
           item.permalink.includes(normalized)

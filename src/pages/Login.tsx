@@ -5,17 +5,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
+import { Creator } from '@/data/mockData';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Users, Camera } from 'lucide-react';
 
 const Login = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useAuth();
+  const { login, register, isAuthenticated } = useAuth();
   const { toast } = useToast();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [selectedRole, setSelectedRole] = useState<'buyer' | 'creator' | null>(
     (searchParams.get('role') as 'buyer' | 'creator') || null
   );
@@ -28,7 +30,7 @@ const Login = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!selectedRole) {
@@ -40,32 +42,63 @@ const Login = () => {
       return;
     }
 
+    if (isRegister && !name.trim()) {
+      toast({
+        title: 'Name is required',
+        description: 'Please enter your name',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setIsLoading(true);
     
     try {
-      const success = await login(email, password, selectedRole);
+      let success;
+      
+      if (isRegister) {
+        success = await register(email, password, selectedRole, name);
+        
+        if (!success) {
+          toast({
+            title: 'Registration failed',
+            description: 'User with this email already exists',
+            variant: 'destructive'
+          });
+          setIsLoading(false);
+          return;
+        }
+      } else {
+        success = await login(email, password, selectedRole);
+      }
       
       if (success) {
+        const user = isRegister ? 
+          { id: selectedRole + Date.now(), email, role: selectedRole, name } : 
+          null;
+          
         toast({
-          title: 'Welcome back!',
-          description: 'Login successful',
+          title: isRegister ? 'Account created!' : 'Welcome back!',
+          description: isRegister ? 'Registration successful' : 'Login successful',
         });
         
         if (selectedRole === 'buyer') {
           navigate('/buyers');
         } else {
-          navigate(`/creator-dashboard/${selectedRole === 'creator' ? 'creator1' : ''}`);
+          // For newly registered creators, use their new ID
+          const creatorId = user?.id || 'creator1';
+          navigate(`/creator-dashboard/${creatorId}`);
         }
       } else {
         toast({
-          title: 'Login failed',
-          description: 'Invalid credentials or role mismatch',
+          title: isRegister ? 'Registration failed' : 'Login failed',
+          description: isRegister ? 'Something went wrong' : 'Invalid credentials or role mismatch',
           variant: 'destructive'
         });
       }
     } catch (error) {
       toast({
-        title: 'Login error',
+        title: isRegister ? 'Registration error' : 'Login error',
         description: 'Something went wrong. Please try again.',
         variant: 'destructive'
       });
@@ -150,7 +183,21 @@ const Login = () => {
                   </div>
                 </div>
 
-                <form onSubmit={handleLogin} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {isRegister && (
+                    <div>
+                      <Label htmlFor="name">Name</Label>
+                      <Input
+                        id="name"
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Enter your full name"
+                        required
+                      />
+                    </div>
+                  )}
+                  
                   <div>
                     <Label htmlFor="email">Email</Label>
                     <Input
