@@ -1,0 +1,409 @@
+import React, { useState, useMemo } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/contexts/AuthContext';
+import { mockCreators, mockRequests, mockBuyers } from '@/data/mockData';
+import { Camera, Instagram, Upload, DollarSign, Clock, CheckCircle, LogOut, User, Plus, X } from 'lucide-react';
+
+const CreatorDashboard = () => {
+  const { id } = useParams<{ id: string }>();
+  const { user, logout } = useAuth();
+  
+  // Find creator data
+  const creator = useMemo(() => {
+    return mockCreators.find(c => c.id === id) || mockCreators[0];
+  }, [id]);
+
+  // Get requests for this creator
+  const creatorRequests = useMemo(() => {
+    return mockRequests.filter(req => req.creatorId === creator.id);
+  }, [creator.id]);
+
+  // Profile editing state
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedProfile, setEditedProfile] = useState({
+    name: creator.name,
+    tags: [...creator.tags],
+    restrictions: [...creator.restrictions],
+  });
+  const [newTag, setNewTag] = useState('');
+  const [newRestriction, setNewRestriction] = useState('');
+
+  const handleSaveProfile = () => {
+    // In real app, this would save to the database
+    console.log('Saving profile:', editedProfile);
+    setIsEditing(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditedProfile({
+      name: creator.name,
+      tags: [...creator.tags],
+      restrictions: [...creator.restrictions],
+    });
+    setIsEditing(false);
+  };
+
+  const addTag = () => {
+    if (newTag.trim() && !editedProfile.tags.includes(newTag.trim())) {
+      setEditedProfile(prev => ({
+        ...prev,
+        tags: [...prev.tags, newTag.trim()]
+      }));
+      setNewTag('');
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setEditedProfile(prev => ({
+      ...prev,
+      tags: prev.tags.filter(tag => tag !== tagToRemove)
+    }));
+  };
+
+  const addRestriction = () => {
+    if (newRestriction.trim() && !editedProfile.restrictions.includes(newRestriction.trim())) {
+      setEditedProfile(prev => ({
+        ...prev,
+        restrictions: [...prev.restrictions, newRestriction.trim()]
+      }));
+      setNewRestriction('');
+    }
+  };
+
+  const removeRestriction = (restrictionToRemove: string) => {
+    setEditedProfile(prev => ({
+      ...prev,
+      restrictions: prev.restrictions.filter(restriction => restriction !== restrictionToRemove)
+    }));
+  };
+
+  const totalEarnings = creatorRequests
+    .filter(req => req.status === 'Completed')
+    .reduce((sum, req) => sum + req.price, 0);
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-subtle">
+      {/* Header */}
+      <header className="bg-white border-b border-border sticky top-0 z-50 shadow-soft">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-4">
+              <Link to="/" className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-hero rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">S</span>
+                </div>
+                <span className="text-xl font-bold">Stockless</span>
+              </Link>
+              <Badge variant="secondary" className="px-3 py-1">
+                <Camera className="w-3 h-3 mr-1" />
+                Creator
+              </Badge>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-muted-foreground">
+                Welcome, {user?.name}
+              </span>
+              <Button variant="ghost" onClick={handleLogout}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="container mx-auto px-6 py-8 max-w-6xl">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Creator Dashboard</h1>
+          <p className="text-muted-foreground">
+            Manage your profile, connect social media, and track licensing requests.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Profile & Settings */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Profile Management */}
+            <Card className="shadow-medium border-0">
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle>Profile Settings</CardTitle>
+                  {!isEditing ? (
+                    <Button variant="outline" onClick={() => setIsEditing(true)}>
+                      Edit Profile
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button variant="ghost" onClick={handleCancelEdit}>
+                        Cancel
+                      </Button>
+                      <Button variant="cta" onClick={handleSaveProfile}>
+                        Save Changes
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <img
+                    src={creator.avatar}
+                    alt={creator.name}
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                  <div>
+                    <h3 className="font-semibold">{creator.name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {creator.gallery.length} items in gallery
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="name">Creator Name</Label>
+                  <Input
+                    id="name"
+                    value={editedProfile.name}
+                    onChange={(e) => setEditedProfile(prev => ({ ...prev, name: e.target.value }))}
+                    disabled={!isEditing}
+                  />
+                </div>
+
+                <div>
+                  <Label>Content Tags</Label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {editedProfile.tags.map((tag) => (
+                      <Badge key={tag} variant="outline" className="text-xs">
+                        {tag}
+                        {isEditing && (
+                          <button
+                            onClick={() => removeTag(tag)}
+                            className="ml-1 hover:text-destructive"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        )}
+                      </Badge>
+                    ))}
+                  </div>
+                  {isEditing && (
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Add new tag"
+                        value={newTag}
+                        onChange={(e) => setNewTag(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && addTag()}
+                      />
+                      <Button variant="outline" size="sm" onClick={addTag}>
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <Label>Usage Restrictions</Label>
+                  <div className="space-y-2 mb-2">
+                    {editedProfile.restrictions.map((restriction) => (
+                      <div key={restriction} className="flex items-center justify-between p-2 bg-muted rounded text-sm">
+                        <span>{restriction}</span>
+                        {isEditing && (
+                          <button
+                            onClick={() => removeRestriction(restriction)}
+                            className="text-destructive hover:text-destructive/80"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  {isEditing && (
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Add new restriction"
+                        value={newRestriction}
+                        onChange={(e) => setNewRestriction(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && addRestriction()}
+                      />
+                      <Button variant="outline" size="sm" onClick={addRestriction}>
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Social Media Connection */}
+            <Card className="shadow-medium border-0">
+              <CardHeader>
+                <CardTitle>Social Media Connection</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Instagram className="w-6 h-6 text-pink-500" />
+                    <div>
+                      <p className="font-medium">Instagram</p>
+                      <p className="text-sm text-muted-foreground">
+                        {creator.socialMediaConnected ? 'Connected' : 'Not connected'}
+                      </p>
+                    </div>
+                  </div>
+                  {creator.socialMediaConnected ? (
+                    <Badge variant="success">Connected</Badge>
+                  ) : (
+                    <Button variant="cta">Connect</Button>
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground mt-3">
+                  {creator.socialMediaConnected 
+                    ? `Synced ${creator.gallery.length} items from your Instagram account.`
+                    : 'Connect your Instagram to start importing content for licensing.'
+                  }
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* License Requests */}
+            <Card className="shadow-medium border-0">
+              <CardHeader>
+                <CardTitle>License Requests</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {creatorRequests.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="font-medium mb-2">No requests yet</h3>
+                    <p className="text-sm text-muted-foreground">
+                      License requests will appear here when buyers request your content.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {creatorRequests.map((request) => {
+                      const buyer = mockBuyers.find(b => b.id === request.buyerId);
+                      return (
+                        <div key={request.id} className="border rounded-lg p-4">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <p className="font-medium">{buyer?.name || 'Unknown Buyer'}</p>
+                              <p className="text-sm text-muted-foreground">
+                                Requested {request.media.length} items • {request.createdAt}
+                              </p>
+                            </div>
+                            <Badge 
+                              variant={request.status === 'Completed' ? 'success' : 'secondary'}
+                            >
+                              {request.status}
+                            </Badge>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4 text-sm mb-3">
+                            <div>
+                              <span className="text-muted-foreground">Usage:</span>
+                              <span className="ml-2">{request.licenseTerms.type}</span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Territory:</span>
+                              <span className="ml-2">{request.licenseTerms.territory}</span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Duration:</span>
+                              <span className="ml-2">{request.licenseTerms.duration}</span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Price:</span>
+                              <span className="ml-2 font-medium text-success">${request.price}</span>
+                            </div>
+                          </div>
+                          
+                          {request.status === 'Pending' && (
+                            <div className="flex gap-2">
+                              <Button variant="cta" size="sm">
+                                <Upload className="w-4 h-4 mr-2" />
+                                Upload Originals
+                              </Button>
+                              <Button variant="outline" size="sm">
+                                View Details
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - Stats & Gallery */}
+          <div className="space-y-6">
+            {/* Earnings Card */}
+            <Card className="shadow-medium border-0">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="w-5 h-5" />
+                  Earnings
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-success mb-2">
+                    ${totalEarnings}
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    From {creatorRequests.filter(r => r.status === 'Completed').length} completed licenses
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Gallery Preview */}
+            <Card className="shadow-medium border-0">
+              <CardHeader>
+                <CardTitle>Gallery Preview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  {creator.gallery.slice(0, 4).map((item) => (
+                    <img
+                      key={item.id}
+                      src={item.thumb}
+                      alt={item.caption}
+                      className="w-full h-20 object-cover rounded"
+                    />
+                  ))}
+                </div>
+                <p className="text-sm text-muted-foreground text-center">
+                  {creator.gallery.length} items in your gallery
+                </p>
+                {!creator.socialMediaConnected && (
+                  <Button variant="outline" className="w-full mt-3">
+                    <Instagram className="w-4 h-4 mr-2" />
+                    Connect Instagram
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default CreatorDashboard;
