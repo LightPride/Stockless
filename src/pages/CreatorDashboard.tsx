@@ -6,9 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useAuth } from '@/contexts/AuthContext';
 import { mockCreators, mockRequests, mockBuyers } from '@/data/mockData';
-import { Camera, Instagram, Upload, DollarSign, Clock, CheckCircle, LogOut, User, Plus, X, FileText, AlertTriangle } from 'lucide-react';
+import { Camera, Instagram, Upload, DollarSign, Clock, CheckCircle, LogOut, User, Plus, X, FileText, AlertTriangle, Edit2 } from 'lucide-react';
 import ContractModal from '@/components/ContractModal';
 
 const CreatorDashboard = () => {
@@ -40,6 +41,8 @@ const CreatorDashboard = () => {
   const [newTag, setNewTag] = useState('');
   const [newRestriction, setNewRestriction] = useState('');
   const [showContractModal, setShowContractModal] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [newAvatarUrl, setNewAvatarUrl] = useState('');
 
   const handleSaveProfile = () => {
     // Persist edits to mock DB (localStorage)
@@ -149,6 +152,21 @@ const CreatorDashboard = () => {
     setDataVersion((v) => v + 1);
   };
 
+  const handleSavePhoto = () => {
+    if (creator && newAvatarUrl.trim()) {
+      const storedCreators = localStorage.getItem('stockless_creators');
+      const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
+      const idx = allCreators.findIndex((c: any) => c.id === creator.id);
+      if (idx !== -1) {
+        allCreators[idx] = { ...allCreators[idx], avatar: newAvatarUrl.trim() };
+        localStorage.setItem('stockless_creators', JSON.stringify(allCreators));
+      }
+      setShowPhotoModal(false);
+      setNewAvatarUrl('');
+      setDataVersion((v) => v + 1);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-subtle">
       {/* Header */}
@@ -215,11 +233,21 @@ const CreatorDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <img
-                    src={creator.avatar}
-                    alt={creator.name}
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
+                  <div className="relative">
+                    <img
+                      src={creator.avatar}
+                      alt={creator.name}
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full p-0"
+                      onClick={() => setShowPhotoModal(true)}
+                    >
+                      <Edit2 className="w-3 h-3" />
+                    </Button>
+                  </div>
                   <div>
                     <h3 className="font-semibold">{creator.name}</h3>
                     <p className="text-sm text-muted-foreground">
@@ -488,6 +516,47 @@ const CreatorDashboard = () => {
           onSign={handleSignContract}
           creatorName={creator.name}
         />
+
+        {/* Photo Change Modal */}
+        <Dialog open={showPhotoModal} onOpenChange={setShowPhotoModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Change Profile Photo</DialogTitle>
+              <DialogDescription>
+                Enter the URL of your new profile photo
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="avatar-url">Photo URL</Label>
+                <Input
+                  id="avatar-url"
+                  placeholder="https://example.com/your-photo.jpg"
+                  value={newAvatarUrl}
+                  onChange={(e) => setNewAvatarUrl(e.target.value)}
+                />
+              </div>
+              {newAvatarUrl && (
+                <div className="flex justify-center">
+                  <img
+                    src={newAvatarUrl}
+                    alt="Preview"
+                    className="w-20 h-20 rounded-full object-cover"
+                    onError={() => {}}
+                  />
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowPhotoModal(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSavePhoto} disabled={!newAvatarUrl.trim()}>
+                Save Photo
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );

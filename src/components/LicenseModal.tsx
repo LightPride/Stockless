@@ -66,6 +66,24 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onC
     
     // Simulate payment processing
     await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Create license request and store in localStorage
+    const newRequest = {
+      id: `req_${Date.now()}`,
+      buyerId: 'buyer1', // In real app, get from auth context
+      creatorId: creator.id,
+      media: selectedItems.map(item => item.id),
+      status: 'Pending' as const,
+      licenseTerms,
+      createdAt: new Date().toISOString().split('T')[0],
+      price: calculatePrice(),
+    };
+
+    // Store request in localStorage
+    const storedRequests = localStorage.getItem('stockless_requests');
+    const allRequests = storedRequests ? JSON.parse(storedRequests) : [];
+    const updatedRequests = [...allRequests, newRequest];
+    localStorage.setItem('stockless_requests', JSON.stringify(updatedRequests));
     
     toast({
       title: 'License request sent!',

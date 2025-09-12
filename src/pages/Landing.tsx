@@ -37,8 +37,8 @@ const Landing = () => {
             directly from creators
           </h1>
           <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-            Find content. License it. Simple. Connect with authentic creators and get the rights you need, 
-            instantly. No middlemen, no hassle.
+            Find content. License it. Simple. Get authentic creator content with full protection - 
+            no direct contact needed, complete privacy for both parties.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
@@ -66,7 +66,7 @@ const Landing = () => {
             </div>
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4" />
-              <span>Direct connection</span>
+              <span>Protected anonymity</span>
             </div>
           </div>
         </div>
