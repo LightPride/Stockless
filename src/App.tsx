@@ -12,6 +12,7 @@ import CreatorGallery from "./pages/CreatorGallery";
 import CreatorDashboard from "./pages/CreatorDashboard";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import NotFound from "./pages/NotFound";
+import HomeRedirect from "@/components/HomeRedirect";
 
 const queryClient = new QueryClient();
 
@@ -23,7 +24,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Landing />} />
+            <Route path="/" element={<HomeRedirect />} />
             <Route path="/login" element={<Login />} />
             <Route path="/buyers" element={
               <ProtectedRoute requiredRole="buyer">

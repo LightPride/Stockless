@@ -20,7 +20,7 @@ const Login = () => {
     (searchParams.get('role') as 'buyer' | 'creator') || null
   );
   const [isLoading, setIsLoading] = useState(false);
-
+  const [isRegister, setIsRegister] = useState(false);
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {

@@ -1,18 +1,19 @@
-import React, { useState, useMemo } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 import { mockCreators, MediaItem } from '@/data/mockData';
-import { ArrowLeft, ExternalLink, ShoppingCart, User, AlertCircle } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Check, User, AlertCircle } from 'lucide-react';
 import LicenseModal from '@/components/LicenseModal';
 
 const CreatorGallery = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   
   const [selectedMedia, setSelectedMedia] = useState<string[]>([]);
   const [showLicenseModal, setShowLicenseModal] = useState(false);
@@ -20,6 +21,13 @@ const CreatorGallery = () => {
   const creator = useMemo(() => {
     return mockCreators.find(c => c.id === id);
   }, [id]);
+  
+  useEffect(() => {
+    const selectId = searchParams.get('select');
+    if (selectId && creator?.gallery.some(g => g.id === selectId)) {
+      setSelectedMedia([selectId]);
+    }
+  }, [searchParams, creator]);
 
   if (!creator) {
     return (
@@ -146,11 +154,11 @@ const CreatorGallery = () => {
               onClick={() => toggleMediaSelection(item.id)}
             >
               <div className="relative">
-                <img
-                  src={item.thumb}
-                  alt={item.caption}
-                  className="w-full h-64 object-cover"
-                />
+                  <img
+                    src={item.thumb}
+                    alt={item.caption}
+                    className="w-full aspect-square object-cover"
+                  />
                 
                 {/* Selection Checkbox */}
                 <div className="absolute top-3 left-3">
@@ -176,17 +184,12 @@ const CreatorGallery = () => {
                 {selectedMedia.includes(item.id) && (
                   <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
                     <div className="bg-primary text-white p-2 rounded-full">
-                      <ShoppingCart className="w-5 h-5" />
+                      <Check className="w-5 h-5" />
                     </div>
                   </div>
                 )}
               </div>
 
-              <CardContent className="p-4">
-                <p className="text-sm text-muted-foreground truncate">
-                  {item.caption}
-                </p>
-              </CardContent>
             </Card>
           ))}
         </div>

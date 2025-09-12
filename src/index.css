@@ -10,16 +10,16 @@
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     
-    /* Primary Purple Brand */
-    --primary: 262 83% 58%;
+    /* Primary Estonian Blue Brand */
+    --primary: 206 90% 45%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 262 83% 68%;
-    --primary-dark: 262 83% 48%;
+    --primary-light: 206 90% 55%;
+    --primary-dark: 206 90% 35%;
     
     /* Secondary & Accent */
     --secondary: 240 5% 96%;
     --secondary-foreground: 222.2 84% 4.9%;
-    --accent: 262 83% 58%;
+    --accent: 206 90% 45%;
     --accent-foreground: 0 0% 100%;
     
     /* Muted Colors */
@@ -27,9 +27,9 @@
     --muted-foreground: 240 3.8% 46.1%;
     
     /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(262 83% 58%), hsl(280 100% 70%));
-    --gradient-card: linear-gradient(135deg, hsl(262 83% 58%), hsl(220 100% 70%));
-    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(240 4.8% 98%));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)), hsl(210 100% 60%));
+    --gradient-card: linear-gradient(135deg, hsl(var(--primary)), hsl(210 100% 70%));
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(210 20% 98%));
     
     /* UI Elements */
     --card: 0 0% 100%;
@@ -38,7 +38,7 @@
     --popover-foreground: 222.2 84% 4.9%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 262 83% 58%;
+    --ring: var(--primary);
     
     /* Status Colors */
     --destructive: 0 84.2% 60.2%;

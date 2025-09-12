@@ -47,9 +47,30 @@ const BuyerCatalog = () => {
     navigate('/');
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-subtle">
-      {/* Header */}
+
+  const handleSearchInput = (value: string) => {
+    setSearchTerm(value);
+    const url = value.trim();
+    const isInstagramUrl = /https?:\/\/(www\.)?instagram\.com\//i.test(url);
+    if (!isInstagramUrl) return;
+
+    const normalized = url.replace(/\/?$/, '');
+
+    for (const creator of mockCreators) {
+      const found = creator.gallery.find(
+        (item) =>
+          item.permalink.replace(/\/?$/, '') === normalized ||
+          normalized.includes(item.permalink.replace(/\/?$/, '')) ||
+          item.permalink.includes(normalized)
+      );
+      if (found) {
+        navigate(`/profile/${creator.id}?select=${found.id}`);
+        break;
+      }
+    }
+  };
+    return (
+      <div className="min-h-screen bg-gradient-subtle">
       <header className="bg-white border-b border-border sticky top-0 z-50 shadow-soft">
         <div className="container mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
@@ -93,9 +114,9 @@ const BuyerCatalog = () => {
           <div className="relative">
             <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Search creators by name..."
+              placeholder="Search creators by name or paste Instagram URL..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearchInput(e.target.value)}
               className="pl-10 max-w-md"
             />
           </div>
