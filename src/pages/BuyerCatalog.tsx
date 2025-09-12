@@ -171,11 +171,6 @@ const BuyerCatalog = () => {
                   alt={creator.name}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute top-4 right-4">
-                  <Badge variant="secondary" className="bg-white/90 text-foreground">
-                    {creator.gallery.length} items
-                  </Badge>
-                </div>
               </div>
               
               <CardContent className="p-6">
