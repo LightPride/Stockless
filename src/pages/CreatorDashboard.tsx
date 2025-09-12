@@ -351,6 +351,28 @@ const CreatorDashboard = () => {
                   </div>
                 )}
                 
+                {creator.contractSigned && (
+                  <div className="mt-4 p-3 bg-success/10 rounded-lg border border-success/20">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-success mt-0.5" />
+                      <div className="text-sm">
+                        <p className="font-medium text-success mb-1">Contract Signed</p>
+                        <p className="text-muted-foreground mb-2">
+                          Estonian licensing contract has been signed and is active.
+                        </p>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => setShowContractModal(true)}
+                        >
+                          <FileText className="w-3 h-3 mr-1" />
+                          View Contract
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 <p className="text-sm text-muted-foreground mt-3">
                   {creator.socialMediaConnected 
                     ? `Synced ${creator.gallery.length} items from your Instagram account.`
