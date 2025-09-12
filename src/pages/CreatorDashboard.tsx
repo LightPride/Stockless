@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/AuthContext';
 import { mockCreators, mockRequests, mockBuyers } from '@/data/mockData';
-import { Camera, Instagram, Upload, DollarSign, Clock, CheckCircle, LogOut, User, Plus, X } from 'lucide-react';
+import { Camera, Instagram, Upload, DollarSign, Clock, CheckCircle, LogOut, User, Plus, X, FileText, AlertTriangle } from 'lucide-react';
+import ContractModal from '@/components/ContractModal';
 
 const CreatorDashboard = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,6 +34,7 @@ const CreatorDashboard = () => {
   });
   const [newTag, setNewTag] = useState('');
   const [newRestriction, setNewRestriction] = useState('');
+  const [showContractModal, setShowContractModal] = useState(false);
 
   const handleSaveProfile = () => {
     // In real app, this would save to the database
@@ -89,6 +91,22 @@ const CreatorDashboard = () => {
 
   const handleLogout = () => {
     logout();
+  };
+
+  const handleConnectSocialMedia = () => {
+    if (!creator.contractSigned) {
+      setShowContractModal(true);
+    } else {
+      // Handle actual social media connection
+      console.log('Connecting social media...');
+    }
+  };
+
+  const handleSignContract = () => {
+    // In real app, this would update the database
+    console.log('Contract signed for:', creator.name);
+    setShowContractModal(false);
+    // Mock updating the creator's contract status
   };
 
   return (
@@ -265,13 +283,40 @@ const CreatorDashboard = () => {
                   {creator.socialMediaConnected ? (
                     <Badge variant="success">Connected</Badge>
                   ) : (
-                    <Button variant="cta">Connect</Button>
+                    <Button variant="cta" onClick={handleConnectSocialMedia}>
+                      Connect
+                    </Button>
                   )}
                 </div>
+                
+                {!creator.contractSigned && (
+                  <div className="mt-4 p-3 bg-warning/10 rounded-lg border border-warning/20">
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle className="w-4 h-4 text-warning mt-0.5" />
+                      <div className="text-sm">
+                        <p className="font-medium text-warning mb-1">Contract Required</p>
+                        <p className="text-muted-foreground mb-2">
+                          You must sign the Estonian licensing contract before connecting social media.
+                        </p>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => setShowContractModal(true)}
+                        >
+                          <FileText className="w-3 h-3 mr-1" />
+                          View Contract
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 <p className="text-sm text-muted-foreground mt-3">
                   {creator.socialMediaConnected 
                     ? `Synced ${creator.gallery.length} items from your Instagram account.`
-                    : 'Connect your Instagram to start importing content for licensing.'
+                    : creator.contractSigned 
+                      ? 'Ready to connect your Instagram account.'
+                      : 'Sign the contract to enable Instagram connection.'
                   }
                 </p>
               </CardContent>
@@ -313,12 +358,12 @@ const CreatorDashboard = () => {
                           
                           <div className="grid grid-cols-2 gap-4 text-sm mb-3">
                             <div>
-                              <span className="text-muted-foreground">Usage:</span>
-                              <span className="ml-2">{request.licenseTerms.type}</span>
+                              <span className="text-muted-foreground">Media:</span>
+                              <span className="ml-2">{request.licenseTerms.mediaType}</span>
                             </div>
                             <div>
-                              <span className="text-muted-foreground">Territory:</span>
-                              <span className="ml-2">{request.licenseTerms.territory}</span>
+                              <span className="text-muted-foreground">Editing:</span>
+                              <span className="ml-2">{request.licenseTerms.editingRights ? 'Allowed' : 'Not allowed'}</span>
                             </div>
                             <div>
                               <span className="text-muted-foreground">Duration:</span>
@@ -371,36 +416,16 @@ const CreatorDashboard = () => {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Gallery Preview */}
-            <Card className="shadow-medium border-0">
-              <CardHeader>
-                <CardTitle>Gallery Preview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-2 mb-4">
-                  {creator.gallery.slice(0, 4).map((item) => (
-                    <img
-                      key={item.id}
-                      src={item.thumb}
-                      alt={item.caption}
-                      className="w-full h-20 object-cover rounded"
-                    />
-                  ))}
-                </div>
-                <p className="text-sm text-muted-foreground text-center">
-                  {creator.gallery.length} items in your gallery
-                </p>
-                {!creator.socialMediaConnected && (
-                  <Button variant="outline" className="w-full mt-3">
-                    <Instagram className="w-4 h-4 mr-2" />
-                    Connect Instagram
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
           </div>
         </div>
+        
+        {/* Contract Modal */}
+        <ContractModal
+          isOpen={showContractModal}
+          onClose={() => setShowContractModal(false)}
+          onSign={handleSignContract}
+          creatorName={creator.name}
+        />
       </main>
     </div>
   );

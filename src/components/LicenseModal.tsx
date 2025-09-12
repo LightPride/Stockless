@@ -29,8 +29,8 @@ interface LicenseModalProps {
 }
 
 interface LicenseTerms {
-  type: 'Commercial' | 'Editorial';
-  territory: 'Local' | 'Regional' | 'Global';
+  mediaType: 'Photo' | 'Video';
+  editingRights: boolean;
   duration: string;
   exclusivity: boolean;
 }
@@ -41,19 +41,17 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onC
   const [isProcessing, setIsProcessing] = useState(false);
   
   const [licenseTerms, setLicenseTerms] = useState<LicenseTerms>({
-    type: 'Commercial',
-    territory: 'Global',
+    mediaType: 'Photo',
+    editingRights: false,
     duration: '12 months',
     exclusivity: false,
   });
 
-  // Mock pricing calculation
   const calculatePrice = () => {
     let basePrice = selectedItems.length * 50; // $50 per item
     
-    if (licenseTerms.type === 'Commercial') basePrice *= 2;
-    if (licenseTerms.territory === 'Global') basePrice *= 1.5;
-    if (licenseTerms.territory === 'Regional') basePrice *= 1.2;
+    if (licenseTerms.mediaType === 'Video') basePrice *= 1.5;
+    if (licenseTerms.editingRights) basePrice *= 1.3;
     if (licenseTerms.exclusivity) basePrice *= 2;
     
     const duration = parseInt(licenseTerms.duration);
@@ -125,38 +123,19 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onC
             
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="usage-type">Usage Type</Label>
+                <Label htmlFor="media-type">Media Type</Label>
                 <Select 
-                  value={licenseTerms.type} 
-                  onValueChange={(value: 'Commercial' | 'Editorial') => 
-                    setLicenseTerms(prev => ({ ...prev, type: value }))
+                  value={licenseTerms.mediaType} 
+                  onValueChange={(value: 'Photo' | 'Video') => 
+                    setLicenseTerms(prev => ({ ...prev, mediaType: value }))
                   }
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Commercial">Commercial</SelectItem>
-                    <SelectItem value="Editorial">Editorial</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="territory">Territory</Label>
-                <Select 
-                  value={licenseTerms.territory} 
-                  onValueChange={(value: 'Local' | 'Regional' | 'Global') => 
-                    setLicenseTerms(prev => ({ ...prev, territory: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Local">Local</SelectItem>
-                    <SelectItem value="Regional">Regional</SelectItem>
-                    <SelectItem value="Global">Global</SelectItem>
+                    <SelectItem value="Photo">Photo</SelectItem>
+                    <SelectItem value="Video">Video</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -179,6 +158,19 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onC
                     <SelectItem value="24 months">24 months</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="flex items-center space-x-2 pt-6">
+                <Switch
+                  id="editing-rights"
+                  checked={licenseTerms.editingRights}
+                  onCheckedChange={(checked) => 
+                    setLicenseTerms(prev => ({ ...prev, editingRights: checked }))
+                  }
+                />
+                <Label htmlFor="editing-rights" className="text-sm">
+                  Editing rights included
+                </Label>
               </div>
 
               <div className="flex items-center space-x-2 pt-6">
@@ -216,16 +208,16 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onC
                 <span>Base price ({selectedItems.length} items)</span>
                 <span>${selectedItems.length * 50}</span>
               </div>
-              {licenseTerms.type === 'Commercial' && (
+              {licenseTerms.mediaType === 'Video' && (
                 <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Commercial usage</span>
-                  <span>+100%</span>
+                  <span>Video content</span>
+                  <span>+50%</span>
                 </div>
               )}
-              {licenseTerms.territory !== 'Local' && (
+              {licenseTerms.editingRights && (
                 <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>{licenseTerms.territory} territory</span>
-                  <span>+{licenseTerms.territory === 'Global' ? '50%' : '20%'}</span>
+                  <span>Editing rights</span>
+                  <span>+30%</span>
                 </div>
               )}
               {licenseTerms.exclusivity && (

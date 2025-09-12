@@ -9,6 +9,7 @@ export interface Creator {
   socialMediaConnected: boolean;
   socialMediaType: string;
   gallery: MediaItem[];
+  contractSigned: boolean;
 }
 
 export interface MediaItem {
@@ -31,9 +32,9 @@ export interface LicenseRequest {
   media: string[];
   status: 'Pending' | 'Completed' | 'Rejected';
   licenseTerms: {
-    type: 'Commercial' | 'Editorial';
+    mediaType: 'Photo' | 'Video';
+    editingRights: boolean;
     duration: string;
-    territory: 'Local' | 'Regional' | 'Global';
     exclusivity: boolean;
   };
   createdAt: string;
@@ -53,6 +54,7 @@ export const mockUsers: User[] = [
   { id: 'creator1', email: 'alice@demo.com', role: 'creator', name: 'Alice Johnson' },
   { id: 'creator2', email: 'bob@demo.com', role: 'creator', name: 'Bob Wilson' },
   { id: 'creator3', email: 'sara@demo.com', role: 'creator', name: 'Sara Chen' },
+  { id: 'creator4', email: 'john@demo.com', role: 'creator', name: 'John Doe' },
 ];
 
 // Mock Creators Database
@@ -65,6 +67,7 @@ export const mockCreators: Creator[] = [
     restrictions: ['Not for alcohol', 'Not for political ads'],
     socialMediaConnected: true,
     socialMediaType: 'Instagram',
+    contractSigned: true,
     gallery: [
       {
         id: 'media1',
@@ -112,6 +115,7 @@ export const mockCreators: Creator[] = [
     restrictions: ['Not for competitors'],
     socialMediaConnected: true,
     socialMediaType: 'Instagram',
+    contractSigned: true,
     gallery: [
       {
         id: 'media7',
@@ -141,6 +145,7 @@ export const mockCreators: Creator[] = [
     restrictions: ['No fast food brands'],
     socialMediaConnected: true,
     socialMediaType: 'Instagram',
+    contractSigned: true,
     gallery: [
       {
         id: 'media10',
@@ -161,6 +166,17 @@ export const mockCreators: Creator[] = [
         caption: 'Travel memories'
       }
     ]
+  },
+  {
+    id: 'creator4',
+    name: 'John Doe',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
+    tags: ['Technology', 'Business'],
+    restrictions: ['Commercial use only'],
+    socialMediaConnected: false,
+    socialMediaType: 'Instagram',
+    contractSigned: false,
+    gallery: []
   }
 ];
 
@@ -182,9 +198,9 @@ export const mockRequests: LicenseRequest[] = [
     media: ['media1', 'media2'],
     status: 'Completed',
     licenseTerms: {
-      type: 'Commercial',
+      mediaType: 'Photo',
+      editingRights: false,
       duration: '12 months',
-      territory: 'Global',
       exclusivity: true
     },
     createdAt: '2024-01-15',
@@ -197,9 +213,9 @@ export const mockRequests: LicenseRequest[] = [
     media: ['media7'],
     status: 'Pending',
     licenseTerms: {
-      type: 'Editorial',
+      mediaType: 'Video',
+      editingRights: true,
       duration: '6 months',
-      territory: 'Regional',
       exclusivity: false
     },
     createdAt: '2024-01-20',

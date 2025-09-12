@@ -21,7 +21,7 @@ const Login = () => {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
-  // Redirect if already authenticated
+
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/');
@@ -51,7 +51,6 @@ const Login = () => {
           description: 'Login successful',
         });
         
-        // Redirect based on role
         if (selectedRole === 'buyer') {
           navigate('/buyers');
         } else {
@@ -75,7 +74,6 @@ const Login = () => {
     }
   };
 
-  // Demo credentials helper
   const fillDemoCredentials = (role: 'buyer' | 'creator') => {
     setSelectedRole(role);
     if (role === 'buyer') {
@@ -90,7 +88,6 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-6">
       <div className="w-full max-w-md">
-        {/* Header */}
         <div className="text-center mb-8">
           <Button variant="ghost" asChild className="mb-4">
             <Link to="/">
@@ -111,10 +108,9 @@ const Login = () => {
 
         <Card className="shadow-medium border-0">
           <CardHeader>
-            <CardTitle>Login</CardTitle>
+            <CardTitle>{isRegister ? 'Register' : 'Login'}</CardTitle>
           </CardHeader>
           <CardContent>
-            {/* Role Selection */}
             {!selectedRole && (
               <div className="space-y-4 mb-6">
                 <Label className="text-base font-medium">I am a...</Label>
@@ -144,7 +140,7 @@ const Login = () => {
                 <div className="mb-6 p-4 bg-muted rounded-lg flex items-center gap-3">
                   {selectedRole === 'buyer' ? <Users className="w-5 h-5" /> : <Camera className="w-5 h-5" />}
                   <div>
-                    <p className="font-medium">Signing in as {selectedRole}</p>
+                    <p className="font-medium">{isRegister ? 'Registering' : 'Signing in'} as {selectedRole}</p>
                     <button 
                       onClick={() => setSelectedRole(null)}
                       className="text-sm text-primary hover:underline"
@@ -185,11 +181,19 @@ const Login = () => {
                     disabled={isLoading}
                     variant="cta"
                   >
-                    {isLoading ? 'Signing in...' : 'Sign In'}
+                    {isLoading ? (isRegister ? 'Creating account...' : 'Signing in...') : (isRegister ? 'Create Account' : 'Sign In')}
                   </Button>
                 </form>
 
-                {/* Demo Credentials */}
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={() => setIsRegister(!isRegister)}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {isRegister ? 'Already have an account? Sign in' : "Don't have an account? Register"}
+                  </button>
+                </div>
+
                 <div className="mt-6 p-4 bg-gradient-subtle rounded-lg border">
                   <p className="text-sm font-medium mb-3">Demo Credentials:</p>
                   <div className="space-y-2">

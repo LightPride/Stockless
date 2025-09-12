@@ -3,7 +3,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Download, FileText, ArrowRight } from 'lucide-react';
+import { CheckCircle, Download, FileText } from 'lucide-react';
 
 interface LocationState {
   creator: {
@@ -17,8 +17,8 @@ interface LocationState {
     caption: string;
   }>;
   licenseTerms: {
-    type: string;
-    territory: string;
+    mediaType: string;
+    editingRights: boolean;
     duration: string;
     exclusivity: boolean;
   };
@@ -45,19 +45,70 @@ const CheckoutSuccess = () => {
 
   const { creator, selectedItems, licenseTerms, price, orderId } = state;
 
-  // Mock download functionality
-  const handleDownload = (type: 'media' | 'license') => {
-    const filename = type === 'media' 
-      ? `stockless-media-${orderId}.zip` 
-      : `license-agreement-${orderId}.pdf`;
+  const downloadLicense = () => {
+    const licenseContent = `
+STOCKLESS LICENSING AGREEMENT
+Order ID: ${orderId}
+Date: ${new Date().toLocaleDateString()}
+
+LICENSED CONTENT:
+${selectedItems.map((item, index) => `${index + 1}. ${item.caption} (ID: ${item.id})`).join('\n')}
+
+CREATOR: ${creator.name}
+BUYER: Licensed User
+
+LICENSE TERMS:
+- Media Type: ${licenseTerms.mediaType}
+- Editing Rights: ${licenseTerms.editingRights ? 'Granted' : 'Not Granted'}
+- Duration: ${licenseTerms.duration}
+- Exclusive Rights: ${licenseTerms.exclusivity ? 'Yes' : 'No'}
+- Total Price: $${price}
+
+This license grants the buyer the right to use the above content according to the specified terms.
+Valid under Estonian law.
+
+Issued by: Stockless OÜ
+`;
+
+    const blob = new Blob([licenseContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Stockless_License_${orderId}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const downloadMedia = (item: any) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 640;
+    canvas.height = 640;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.fillStyle = '#2563eb';
+      ctx.fillRect(0, 0, 640, 640);
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 24px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('STOCKLESS', 320, 300);
+      ctx.fillText('Licensed Content', 320, 340);
+      ctx.fillText(item.caption, 320, 380);
+    }
     
-    // Create a mock download
-    const link = document.createElement('a');
-    link.href = '#'; // In real app, this would be the actual file URL
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${item.caption.replace(/\s+/g, '_')}_${item.id}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    });
   };
 
   return (
@@ -103,23 +154,11 @@ const CheckoutSuccess = () => {
               </div>
 
               {/* License Terms */}
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Usage Type:</span>
-                  <p className="font-medium">{licenseTerms.type}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Territory:</span>
-                  <p className="font-medium">{licenseTerms.territory}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Duration:</span>
-                  <p className="font-medium">{licenseTerms.duration}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Exclusivity:</span>
-                  <p className="font-medium">{licenseTerms.exclusivity ? 'Exclusive' : 'Non-exclusive'}</p>
-                </div>
+              <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+                <div><span className="font-medium">Media Type:</span> {licenseTerms.mediaType}</div>
+                <div><span className="font-medium">Editing Rights:</span> {licenseTerms.editingRights ? 'Granted' : 'Not Granted'}</div>
+                <div><span className="font-medium">Duration:</span> {licenseTerms.duration}</div>
+                <div><span className="font-medium">Exclusive:</span> {licenseTerms.exclusivity ? 'Yes' : 'No'}</div>
               </div>
 
               {/* Price */}
@@ -166,26 +205,29 @@ const CheckoutSuccess = () => {
           <CardHeader>
             <CardTitle>Downloads</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <Button 
-              onClick={() => handleDownload('media')} 
-              variant="cta"
-              className="w-full justify-start"
-            >
-              <Download className="w-4 h-4 mr-3" />
-              Download Media Files (.zip)
-              <ArrowRight className="w-4 h-4 ml-auto" />
-            </Button>
-            
-            <Button 
-              onClick={() => handleDownload('license')} 
-              variant="outline"
-              className="w-full justify-start"
-            >
-              <FileText className="w-4 h-4 mr-3" />
-              Download License Agreement (.pdf)
-              <ArrowRight className="w-4 h-4 ml-auto" />
-            </Button>
+          <CardContent>
+            <div className="space-y-3">
+              <Button onClick={downloadLicense} variant="cta" className="w-full">
+                <Download className="w-4 h-4 mr-2" />
+                Download License Agreement
+              </Button>
+              
+              {selectedItems.map((item) => (
+                <Button 
+                  key={item.id} 
+                  onClick={() => downloadMedia(item)} 
+                  variant="outline" 
+                  className="w-full justify-start"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download: {item.caption}
+                </Button>
+              ))}
+            </div>
+
+            <p className="text-xs text-muted-foreground text-center mb-4">
+              Files are ready for download. License terms apply as specified above.
+            </p>
           </CardContent>
         </Card>
 
@@ -199,11 +241,6 @@ const CheckoutSuccess = () => {
             <Button asChild variant="cta">
               <Link to="/buyers">
                 Browse More Creators
-              </Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link to="/orders">
-                View Order History
               </Link>
             </Button>
           </div>
