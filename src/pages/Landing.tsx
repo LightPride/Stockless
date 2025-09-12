@@ -66,7 +66,7 @@ const Landing = () => {
             </div>
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4" />
-              <span>Protected anonymity</span>
+              <span>Double verification</span>
             </div>
           </div>
         </div>
