@@ -170,7 +170,7 @@ const CreatorDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-subtle">
       {/* Header */}
-      <header style="background-color: #1f1f1f" className="bg-white border-b border-border sticky top-0 z-50 shadow-soft">
+      <header style={{backgroundColor: "#1f1f1f"}} className="bg-white border-b border-border sticky top-0 z-50 shadow-soft">
         <div className="container mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
