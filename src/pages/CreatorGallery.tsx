@@ -8,9 +8,33 @@ import CartIcon from '@/components/CartIcon';
 import CartModal from '@/components/CartModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
-import { mockCreators, MediaItem } from '@/data/mockData';
-import { ArrowLeft, ExternalLink, Check, User, AlertCircle, Plus, LogOut } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { ArrowLeft, ExternalLink, Check, User, AlertCircle, Plus, LogOut, Play } from 'lucide-react';
 import LicenseModal from '@/components/LicenseModal';
+
+interface Creator {
+  id: string;
+  name: string;
+  avatar_url: string;
+  bio?: string;
+  tags: string[];
+  restrictions: string[];
+  social_media_connected: boolean;
+  social_media_type: string;
+  contract_signed: boolean;
+}
+
+interface MediaItem {
+  id: string;
+  title?: string;
+  caption?: string;
+  media_type: 'image' | 'video';
+  thumbnail_url: string;
+  full_url: string;
+  license_price: number;
+  dimensions?: { width: number; height: number };
+  duration?: number;
+}
 
 const CreatorGallery = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,17 +46,92 @@ const CreatorGallery = () => {
   const [selectedMedia, setSelectedMedia] = useState<string[]>([]);
   const [showLicenseModal, setShowLicenseModal] = useState(false);
   const [showCartModal, setShowCartModal] = useState(false);
+  const [creator, setCreator] = useState<Creator | null>(null);
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const creator = useMemo(() => {
-    return mockCreators.find(c => c.id === id);
+  // Fetch creator and media data from database
+  useEffect(() => {
+    const fetchCreatorData = async () => {
+      if (!id) return;
+
+      try {
+        // Fetch creator profile
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', id)
+          .eq('role', 'creator')
+          .single();
+
+        if (profileError) {
+          console.error('Error fetching creator:', profileError);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch creator's media items
+        const { data: media, error: mediaError } = await supabase
+          .from('media_items')
+          .select('*')
+          .eq('creator_id', id)
+          .eq('is_available', true)
+          .order('created_at', { ascending: false });
+
+        if (mediaError) {
+          console.error('Error fetching media:', mediaError);
+        }
+
+        setCreator({
+          id: profile.id,
+          name: profile.name,
+          avatar_url: profile.avatar_url || '',
+          bio: profile.bio,
+          tags: profile.tags || [],
+          restrictions: profile.restrictions || [],
+          social_media_connected: profile.social_media_connected,
+          social_media_type: profile.social_media_type || 'Instagram',
+          contract_signed: profile.contract_signed
+        });
+
+        setMediaItems((media || []).map(item => ({
+          id: item.id,
+          title: item.title || undefined,
+          caption: item.caption || undefined,
+          media_type: item.media_type as 'image' | 'video',
+          thumbnail_url: item.thumbnail_url,
+          full_url: item.full_url,
+          license_price: item.license_price,
+          dimensions: item.dimensions ? item.dimensions as { width: number; height: number } : undefined,
+          duration: item.duration || undefined
+        })));
+      } catch (error) {
+        console.error('Error fetching creator data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCreatorData();
   }, [id]);
   
   useEffect(() => {
     const selectId = searchParams.get('select');
-    if (selectId && creator?.gallery.some(g => g.id === selectId)) {
+    if (selectId && mediaItems.some(item => item.id === selectId)) {
       setSelectedMedia([selectId]);
     }
-  }, [searchParams, creator]);
+  }, [searchParams, mediaItems]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading creator profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!creator) {
     return (
@@ -59,12 +158,6 @@ const CreatorGallery = () => {
     window.open(permalink, '_blank');
   };
 
-  const handleAddToCart = async (item: MediaItem) => {
-    if (creator) {
-      await addToCart(item, creator);
-    }
-  };
-
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -75,7 +168,32 @@ const CreatorGallery = () => {
     setShowLicenseModal(true);
   };
 
-  const selectedItems = creator.gallery.filter(item => selectedMedia.includes(item.id));
+  const handleAddToCart = async (item: MediaItem) => {
+    if (creator) {
+      // Convert database media item to cart format
+      const cartItem = {
+        id: item.id,
+        thumb: item.thumbnail_url,
+        caption: item.caption || item.title || '',
+        permalink: item.full_url // Using full_url as permalink for now
+      };
+      // Create a mock creator in the old format for the cart
+      const mockCreator = {
+        id: creator.id,
+        name: creator.name,
+        avatar: creator.avatar_url,
+        tags: creator.tags,
+        restrictions: creator.restrictions,
+        socialMediaConnected: creator.social_media_connected,
+        socialMediaType: creator.social_media_type,
+        contractSigned: creator.contract_signed,
+        gallery: [] // Empty since we're not using this
+      };
+      await addToCart(cartItem, mockCreator);
+    }
+  };
+
+  const selectedItems = mediaItems.filter(item => selectedMedia.includes(item.id));
 
   return (
     <div className="min-h-screen bg-background">
@@ -120,21 +238,25 @@ const CreatorGallery = () => {
       <section className="bg-card border-b border-border">
         <div className="container mx-auto px-6 py-8">
           <div className="flex items-start gap-6">
-            <img
-              src={creator.avatar}
-              alt={creator.name}
-              className="w-20 h-20 rounded-sm object-cover shadow-sm"
-            />
+                <img
+                  src={creator.avatar_url}
+                  alt={creator.name}
+                  className="w-20 h-20 rounded-sm object-cover shadow-sm"
+                />
             
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
                 <h1 className="text-2xl font-bold text-foreground">{creator.name}</h1>
-                {creator.socialMediaConnected && (
+                {creator.social_media_connected && (
                   <Badge variant="success">
-                    {creator.socialMediaType} Connected
+                    {creator.social_media_type} Connected
                   </Badge>
                 )}
               </div>
+
+              {creator.bio && (
+                <p className="text-muted-foreground mb-3">{creator.bio}</p>
+              )}
 
               <div className="flex flex-wrap gap-2 mb-4">
                 {creator.tags.map(tag => (
@@ -170,7 +292,7 @@ const CreatorGallery = () => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 mb-32">
-          {creator.gallery.map((item) => (
+          {mediaItems.map((item) => (
             <Card 
               key={item.id} 
               className={`overflow-hidden cursor-pointer smooth-transition group ${
@@ -182,10 +304,17 @@ const CreatorGallery = () => {
             >
               <div className="relative">
                 <img
-                  src={item.thumb}
-                  alt={item.caption}
+                  src={item.thumbnail_url}
+                  alt={item.caption || item.title || ''}
                   className="w-full aspect-square object-cover transition-transform duration-200 group-hover:scale-105"
                 />
+                
+                {/* Media Type Indicator */}
+                {item.media_type === 'video' && (
+                  <div className="absolute top-2 left-8 bg-black/70 p-1 rounded-sm">
+                    <Play className="w-3 h-3 text-white" />
+                  </div>
+                )}
                 
                 {/* Selection Checkbox */}
                 <div className="absolute top-2 left-2">
@@ -196,16 +325,10 @@ const CreatorGallery = () => {
                   />
                 </div>
 
-                {/* Instagram Link */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openInstagramPost(item.permalink);
-                  }}
-                  className="absolute top-2 right-2 bg-black/70 p-1.5 rounded-sm hover:bg-black/80 smooth-transition"
-                >
-                  <ExternalLink className="w-3 h-3 text-white" />
-                </button>
+                {/* Price Tag */}
+                <div className="absolute top-2 right-2 bg-black/70 px-2 py-1 rounded-sm text-xs text-white">
+                  ${item.license_price}
+                </div>
 
                 {/* Add to Cart Button */}
                 <button
@@ -228,6 +351,18 @@ const CreatorGallery = () => {
                   </div>
                 )}
               </div>
+              
+              {/* Media Info */}
+              <CardContent className="p-2">
+                <p className="text-xs text-muted-foreground truncate">
+                  {item.title || item.caption || 'Untitled'}
+                </p>
+                {item.media_type === 'video' && item.duration && (
+                  <p className="text-xs text-muted-foreground">
+                    {Math.floor(item.duration / 60)}:{(item.duration % 60).toString().padStart(2, '0')}
+                  </p>
+                )}
+              </CardContent>
             </Card>
           ))}
         </div>
@@ -261,10 +396,25 @@ const CreatorGallery = () => {
       </div>
 
       {/* License Modal */}
-      {showLicenseModal && (
+      {showLicenseModal && selectedItems.length > 0 && (
         <LicenseModal
-          creator={creator}
-          selectedItems={selectedItems}
+          creator={{
+            id: creator.id,
+            name: creator.name,
+            avatar: creator.avatar_url,
+            tags: creator.tags,
+            restrictions: creator.restrictions,
+            socialMediaConnected: creator.social_media_connected,
+            socialMediaType: creator.social_media_type,
+            contractSigned: creator.contract_signed,
+            gallery: []
+          }}
+          selectedItems={selectedItems.map(item => ({
+            id: item.id,
+            thumb: item.thumbnail_url,
+            caption: item.caption || item.title || '',
+            permalink: item.full_url
+          }))}
           onClose={() => setShowLicenseModal(false)}
         />
       )}

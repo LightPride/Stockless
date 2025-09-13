@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,8 +8,21 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import CartIcon from '@/components/CartIcon';
 import CartModal from '@/components/CartModal';
 import { useAuth } from '@/contexts/AuthContext';
-import { mockCreators } from '@/data/mockData';
+import { supabase } from '@/integrations/supabase/client';
 import { Search, Filter, LogOut, User, Eye, ChevronDown } from 'lucide-react';
+
+interface Creator {
+  id: string;
+  name: string;
+  avatar_url: string;
+  bio?: string;
+  tags: string[];
+  restrictions: string[];
+  social_media_connected: boolean;
+  contract_signed: boolean;
+  media_count?: number;
+  sample_media?: string[];
+}
 
 const BuyerCatalog = () => {
   const { user, logout } = useAuth();
@@ -18,37 +31,81 @@ const BuyerCatalog = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [showCartModal, setShowCartModal] = useState(false);
+  const [creators, setCreators] = useState<Creator[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch creators from database
+  useEffect(() => {
+    const fetchCreators = async () => {
+      try {
+        // Fetch creator profiles
+        const { data: profiles, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('role', 'creator')
+          .eq('social_media_connected', true)
+          .eq('contract_signed', true);
+
+        if (profileError) {
+          console.error('Error fetching creators:', profileError);
+          return;
+        }
+
+        // For each creator, get sample media items and count
+        const creatorsWithMedia = await Promise.all(
+          profiles.map(async (profile) => {
+            const { data: mediaItems } = await supabase
+              .from('media_items')
+              .select('thumbnail_url')
+              .eq('creator_id', profile.id)
+              .eq('is_available', true)
+              .limit(4);
+
+            return {
+              id: profile.id,
+              name: profile.name,
+              avatar_url: profile.avatar_url || '',
+              bio: profile.bio,
+              tags: profile.tags || [],
+              restrictions: profile.restrictions || [],
+              social_media_connected: profile.social_media_connected,
+              contract_signed: profile.contract_signed,
+              media_count: mediaItems?.length || 0,
+              sample_media: mediaItems?.map(item => item.thumbnail_url) || []
+            };
+          })
+        );
+
+        setCreators(creatorsWithMedia);
+      } catch (error) {
+        console.error('Error fetching creators:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCreators();
+  }, []);
 
   // Get all unique tags from creators
   const allTags = useMemo(() => {
-    const storedCreators = localStorage.getItem('stockless_creators');
-    const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
     const tags = new Set<string>();
-    allCreators.forEach((creator: any) => {
+    creators.forEach((creator) => {
       creator.tags.forEach((tag: string) => tags.add(tag));
     });
     return Array.from(tags);
-  }, []);
+  }, [creators]);
 
   // Filter creators based on search and tags
   const filteredCreators = useMemo(() => {
-    // Get creators from localStorage if available, otherwise use mock data
-    const storedCreators = localStorage.getItem('stockless_creators');
-    const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
-    
-    return allCreators.filter((creator: any) => {
-      // Only show creators who have signed contract and connected social media
-      if (!creator.contractSigned || !creator.socialMediaConnected) {
-        return false;
-      }
-      
+    return creators.filter((creator) => {
       const matchesSearch = creator.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesTags = selectedTags.length === 0 || 
         selectedTags.some((tag: string) => creator.tags.includes(tag));
       
       return matchesSearch && matchesTags;
     });
-  }, [searchTerm, selectedTags]);
+  }, [creators, searchTerm, selectedTags]);
 
   const toggleTag = (tag: string) => {
     setSelectedTags(prev => 
@@ -66,27 +123,8 @@ const BuyerCatalog = () => {
 
   const handleSearchInput = (value: string) => {
     setSearchTerm(value);
-    const url = value.trim();
-    const isInstagramUrl = /https?:\/\/(www\.)?instagram\.com\//i.test(url);
-    if (!isInstagramUrl) return;
-
-    const normalized = url.replace(/\/?$/, '');
-    const storedCreators = localStorage.getItem('stockless_creators');
-    const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
-
-    
-    for (const creator of allCreators) {
-      const found = creator.gallery.find(
-        (item: any) =>
-          item.permalink.replace(/\/?$/, '') === normalized ||
-          normalized.includes(item.permalink.replace(/\/?$/, '')) ||
-          item.permalink.includes(normalized)
-      );
-      if (found) {
-        navigate(`/profile/${creator.id}?select=${found.id}`);
-        break;
-      }
-    }
+    // Note: Instagram URL search functionality would need to be implemented
+    // with the new database structure if needed
   };
     return (
     <div className="min-h-screen bg-background">
@@ -177,74 +215,86 @@ const BuyerCatalog = () => {
         </div>
 
         {/* Creator Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filteredCreators.map((creator) => (
-            <Card key={creator.id} className="overflow-hidden hover:shadow-md smooth-transition group">
-              <div className="relative h-64 overflow-hidden">
-                {/* Gallery preview grid */}
-                <div className="grid grid-cols-2 h-full gap-0.5">
-                  {creator.gallery.slice(0, 4).map((item, index) => (
-                    <div 
-                      key={item.id} 
-                      className="relative overflow-hidden"
-                    >
-                      <img
-                        src={item.thumb}
-                        alt={`Preview ${index + 1}`}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    </div>
-                  ))}
-                  {creator.gallery.length === 1 && (
-                    <div className="bg-muted flex items-center justify-center">
-                      <span className="text-muted-foreground text-sm">More content available</span>
-                    </div>
-                  )}
-                  {creator.gallery.length === 0 && (
-                    <div className="col-span-2 bg-muted flex items-center justify-center">
-                      <span className="text-muted-foreground text-sm">No content available</span>
-                    </div>
-                  )}
+        {loading ? (
+          <div className="flex justify-center items-center py-16">
+            <div className="text-center">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading creators...</p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredCreators.map((creator) => (
+              <Card key={creator.id} className="overflow-hidden hover:shadow-md smooth-transition group">
+                <div className="relative h-64 overflow-hidden">
+                  {/* Gallery preview grid */}
+                  <div className="grid grid-cols-2 h-full gap-0.5">
+                    {creator.sample_media?.slice(0, 4).map((thumb, index) => (
+                      <div 
+                        key={index} 
+                        className="relative overflow-hidden"
+                      >
+                        <img
+                          src={thumb}
+                          alt={`Preview ${index + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      </div>
+                    ))}
+                    {creator.media_count === 1 && (
+                      <div className="bg-muted flex items-center justify-center">
+                        <span className="text-muted-foreground text-sm">More content available</span>
+                      </div>
+                    )}
+                    {creator.media_count === 0 && (
+                      <div className="col-span-2 bg-muted flex items-center justify-center">
+                        <span className="text-muted-foreground text-sm">No content available</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              {/* Creator Info Section */}
-              <CardContent className="p-4 space-y-3">
-                <div>
-                  <h3 className="text-lg font-semibold">{creator.name}</h3>
-                </div>
-                
-                <div className="flex flex-wrap gap-1">
-                  {creator.tags.slice(0, 3).map(tag => (
-                    <Badge key={tag} variant="secondary" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                  {creator.tags.length > 3 && (
-                    <Badge variant="secondary" className="text-xs">
-                      +{creator.tags.length - 3}
-                    </Badge>
-                  )}
-                </div>
-                
-                <Button asChild variant="gradient-outline" className="w-full">
-                  <Link to={`/profile/${creator.id}`}>
-                    <Eye className="w-4 h-4 mr-2" />
-                    View Gallery
-                  </Link>
-                </Button>
-              </CardContent>
+                {/* Creator Info Section */}
+                <CardContent className="p-4 space-y-3">
+                  <div>
+                    <h3 className="text-lg font-semibold">{creator.name}</h3>
+                    {creator.bio && (
+                      <p className="text-sm text-muted-foreground line-clamp-2">{creator.bio}</p>
+                    )}
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-1">
+                    {creator.tags.slice(0, 3).map(tag => (
+                      <Badge key={tag} variant="secondary" className="text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                    {creator.tags.length > 3 && (
+                      <Badge variant="secondary" className="text-xs">
+                        +{creator.tags.length - 3}
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  <Button asChild variant="gradient-outline" className="w-full">
+                    <Link to={`/profile/${creator.id}`}>
+                      <Eye className="w-4 h-4 mr-2" />
+                      View Gallery ({creator.media_count} items)
+                    </Link>
+                  </Button>
+                </CardContent>
 
-              {/* Restrictions Section */}
-              {creator.restrictions.length > 0 && (
-                <div className="p-3 bg-warning/10 text-xs text-muted-foreground border-t border-border">
-                  <span className="font-medium">Restrictions: </span>
-                  {creator.restrictions.join(', ')}
-                </div>
-              )}
-            </Card>
-          ))}
-        </div>
+                {/* Restrictions Section */}
+                {creator.restrictions.length > 0 && (
+                  <div className="p-3 bg-warning/10 text-xs text-muted-foreground border-t border-border">
+                    <span className="font-medium">Restrictions: </span>
+                    {creator.restrictions.join(', ')}
+                  </div>
+                )}
+              </Card>
+            ))}
+          </div>
+        )}
 
         {filteredCreators.length === 0 && (
           <div className="text-center py-16">
