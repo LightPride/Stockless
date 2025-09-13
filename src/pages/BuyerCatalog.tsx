@@ -9,7 +9,7 @@ import CartIcon from '@/components/CartIcon';
 import CartModal from '@/components/CartModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Filter, LogOut, User, Eye, ChevronDown } from 'lucide-react';
+import { Search, Filter, LogOut, User, Eye, ChevronDown, Play } from 'lucide-react';
 
 interface Creator {
   id: string;
@@ -21,7 +21,11 @@ interface Creator {
   social_media_connected: boolean;
   contract_signed: boolean;
   media_count?: number;
-  sample_media?: string[];
+  sample_media?: Array<{
+    thumbnail_url: string;
+    media_type: string;
+    full_url: string;
+  }>;
 }
 
 const BuyerCatalog = () => {
@@ -56,7 +60,7 @@ const BuyerCatalog = () => {
           profiles.map(async (profile) => {
             const { data: mediaItems } = await supabase
               .from('media_items')
-              .select('thumbnail_url')
+              .select('thumbnail_url, media_type, full_url')
               .eq('creator_id', profile.id)
               .eq('is_available', true)
               .limit(4);
@@ -71,7 +75,7 @@ const BuyerCatalog = () => {
               social_media_connected: profile.social_media_connected,
               contract_signed: profile.contract_signed,
               media_count: mediaItems?.length || 0,
-              sample_media: mediaItems?.map(item => item.thumbnail_url) || []
+              sample_media: mediaItems || []
             };
           })
         );
@@ -229,9 +233,8 @@ const BuyerCatalog = () => {
                 <div className="relative h-64 overflow-hidden">
                   {/* Gallery preview grid */}
                   <div className="grid grid-cols-2 h-full gap-0.5">
-                    {creator.sample_media?.slice(0, 4).map((thumb, index) => {
-                      // Check if this thumbnail is actually a video by looking for video file extensions or mixkit URLs
-                      const isVideo = typeof thumb === 'string' && (thumb.includes('mixkit') || thumb.includes('.mp4'));
+                    {creator.sample_media?.slice(0, 4).map((item, index) => {
+                      const isVideo = item.media_type === 'video';
                       
                       return (
                         <div 
@@ -240,7 +243,7 @@ const BuyerCatalog = () => {
                         >
                           {isVideo ? (
                             <video
-                              src={thumb}
+                              src={item.full_url}
                               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                               autoPlay
                               loop
@@ -249,10 +252,15 @@ const BuyerCatalog = () => {
                             />
                           ) : (
                             <img
-                              src={thumb}
+                              src={item.thumbnail_url}
                               alt={`Preview ${index + 1}`}
                               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                             />
+                          )}
+                          {isVideo && (
+                            <div className="absolute top-2 left-2 bg-black/70 p-1 rounded-sm">
+                              <Play className="w-3 h-3 text-white" />
+                            </div>
                           )}
                         </div>
                       );
