@@ -12,7 +12,7 @@ const HomeRedirect: React.FC = () => {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
-  if (isAuthenticated && user) {
+  if (isAuthenticated && user && user.id) {
     console.log('User authenticated, redirecting based on role:', user.role, 'User ID:', user.id);
     if (user.role === 'buyer') {
       return <Navigate to="/buyers" replace />;
