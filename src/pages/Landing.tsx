@@ -1,9 +1,30 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { ArrowRight, Shield, Zap, Users, Search, Image as ImageIcon, CreditCard, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import Autoplay from "embla-carousel-autoplay";
 
 const Landing = () => {
+  const carouselPhotos = [
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1463100099107-aa0980c362e6?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=400&fit=crop'
+  ];
+
+  const floatingPhotos = [
+    { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop', delay: '0s', x: '10%', y: '15%' },
+    { src: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=250&h=300&fit=crop', delay: '1s', x: '25%', y: '60%' },
+    { src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=280&h=180&fit=crop', delay: '2s', x: '5%', y: '75%' },
+    { src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=320&h=240&fit=crop', delay: '0.5s', x: '35%', y: '25%' },
+    { src: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=200&h=300&fit=crop', delay: '1.5s', x: '15%', y: '40%' },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -29,8 +50,29 @@ const Landing = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="py-24 px-6 bg-gradient-subtle">
-        <div className="container mx-auto text-center max-w-4xl">
+      <section className="py-24 px-6 bg-gradient-subtle relative overflow-hidden">
+        {/* Animated Photo Grid Background */}
+        <div className="absolute left-0 top-0 w-1/2 h-full overflow-hidden opacity-20">
+          {floatingPhotos.map((photo, index) => (
+            <div
+              key={index}
+              className={`absolute hover:scale-110 transition-transform duration-500 cursor-pointer ${
+                index % 2 === 0 ? 'animate-float' : 'animate-float-delayed'
+              }`}
+              style={{
+                left: photo.x,
+                top: photo.y,
+              }}
+            >
+              <img
+                src={photo.src}
+                alt={`Floating photo ${index + 1}`}
+                className="rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:rotate-2"
+              />
+            </div>
+          ))}
+        </div>
+        <div className="container mx-auto text-center max-w-4xl relative z-10">
           <h1 className="text-5xl md:text-6xl font-bold mb-8 text-foreground">
             License content directly
             <span className="block text-primary"> from creators</span>
@@ -69,6 +111,42 @@ const Landing = () => {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Photo Carousel */}
+      <section className="py-12 bg-card border-y border-border overflow-hidden">
+        <div className="container mx-auto px-6 mb-8">
+          <h2 className="text-2xl font-bold text-center text-foreground mb-2">Featured Content</h2>
+          <p className="text-center text-muted-foreground">Discover authentic photos from our creator community</p>
+        </div>
+        <Carousel
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          plugins={[
+            Autoplay({
+              delay: 3000,
+              stopOnInteraction: false,
+              stopOnMouseEnter: true,
+            }),
+          ]}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-2">
+            {[...carouselPhotos, ...carouselPhotos].map((photo, index) => (
+              <CarouselItem key={index} className="pl-2 basis-1/3 md:basis-1/5 lg:basis-1/6">
+                <div className="aspect-square rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                  <img
+                    src={photo}
+                    alt={`Featured photo ${index + 1}`}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
       </section>
 
       {/* How it Works */}

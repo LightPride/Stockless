@@ -4,15 +4,17 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useAuth } from '@/contexts/AuthContext';
 import { mockCreators } from '@/data/mockData';
-import { Search, Filter, LogOut, User, Eye } from 'lucide-react';
+import { Search, Filter, LogOut, User, Eye, ChevronDown } from 'lucide-react';
 
 const BuyerCatalog = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Get all unique tags from creators
   const allTags = useMemo(() => {
@@ -135,30 +137,39 @@ const BuyerCatalog = () => {
             />
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
-            <Filter className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm font-medium">Filter by tags:</span>
-            {allTags.map(tag => (
-              <Button
-                key={tag}
-                variant={selectedTags.includes(tag) ? "cta" : "minimal"}
-                size="sm"
-                onClick={() => toggleTag(tag)}
-              >
-                {tag}
+          <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" className="flex items-center gap-2">
+                <Filter className="w-4 h-4" />
+                <span className="text-sm font-medium">Filter by tags</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${filtersOpen ? 'rotate-180' : ''}`} />
               </Button>
-            ))}
-            {selectedTags.length > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedTags([])}
-                className="text-muted-foreground"
-              >
-                Clear all
-              </Button>
-            )}
-          </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-2">
+              <div className="flex items-center gap-2 flex-wrap pt-2">
+                {allTags.map(tag => (
+                  <Button
+                    key={tag}
+                    variant={selectedTags.includes(tag) ? "cta" : "minimal"}
+                    size="sm"
+                    onClick={() => toggleTag(tag)}
+                  >
+                    {tag}
+                  </Button>
+                ))}
+                {selectedTags.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedTags([])}
+                    className="text-muted-foreground"
+                  >
+                    Clear all
+                  </Button>
+                )}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </div>
 
         {/* Creator Grid */}
@@ -200,7 +211,9 @@ const BuyerCatalog = () => {
                 )}
                 
                 <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <h3 className="text-xl font-semibold text-white mb-2">{creator.name}</h3>
+                  <div className="backdrop-blur-sm bg-black/30 rounded-lg p-3 mb-3">
+                    <h3 className="text-xl font-semibold text-white">{creator.name}</h3>
+                  </div>
                   <div className="flex flex-wrap gap-1 mb-3">
                     {creator.tags.slice(0, 3).map(tag => (
                       <Badge key={tag} variant="outline" className="text-xs bg-white/20 border-white/30 text-white">
