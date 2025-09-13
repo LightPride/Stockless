@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -41,6 +41,7 @@ const CreatorGallery = () => {
   const { user, logout } = useAuth();
   const { addToCart } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   
   const [selectedMedia, setSelectedMedia] = useState<string[]>([]);
@@ -121,6 +122,26 @@ const CreatorGallery = () => {
       setSelectedMedia([selectId]);
     }
   }, [searchParams, mediaItems]);
+
+  // Handle cart checkout state
+  useEffect(() => {
+    const locationState = location.state as any;
+    if (locationState?.fromCart && locationState?.selectedItems && mediaItems.length > 0) {
+      // Auto-select the items from cart and open license modal
+      const cartItemIds = locationState.selectedItems.map((item: any) => item.id);
+      const validIds = cartItemIds.filter((itemId: string) => 
+        mediaItems.some(media => media.id === itemId)
+      );
+      
+      if (validIds.length > 0) {
+        setSelectedMedia(validIds);
+        setShowLicenseModal(true);
+      }
+      
+      // Clear the state to prevent re-triggering
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, mediaItems, navigate]);
 
   if (loading) {
     return (

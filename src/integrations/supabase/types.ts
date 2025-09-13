@@ -109,12 +109,14 @@ export type Database = {
           id: string
           is_demo: boolean | null
           name: string
+          photo_price: number | null
           restrictions: string[] | null
           role: string
           social_media_connected: boolean | null
           social_media_type: string | null
           tags: string[] | null
           updated_at: string | null
+          video_price: number | null
         }
         Insert: {
           avatar_url?: string | null
@@ -124,12 +126,14 @@ export type Database = {
           id: string
           is_demo?: boolean | null
           name: string
+          photo_price?: number | null
           restrictions?: string[] | null
           role: string
           social_media_connected?: boolean | null
           social_media_type?: string | null
           tags?: string[] | null
           updated_at?: string | null
+          video_price?: number | null
         }
         Update: {
           avatar_url?: string | null
@@ -139,12 +143,14 @@ export type Database = {
           id?: string
           is_demo?: boolean | null
           name?: string
+          photo_price?: number | null
           restrictions?: string[] | null
           role?: string
           social_media_connected?: boolean | null
           social_media_type?: string | null
           tags?: string[] | null
           updated_at?: string | null
+          video_price?: number | null
         }
         Relationships: []
       }

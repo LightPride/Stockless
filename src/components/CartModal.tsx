@@ -43,10 +43,32 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose }) => {
     const creatorGroup = groupedItems[creatorId];
     if (!creatorGroup) return;
 
-    // Navigate to creator gallery with selected items
+    // Set up the license modal data
+    const selectedItems = creatorGroup.items.map(item => ({
+      id: item.media_item_id,
+      thumb: item.media_item_data.mediaItem.thumb,
+      caption: item.media_item_data.mediaItem.caption,
+      permalink: item.media_item_data.mediaItem.permalink
+    }));
+
+    // Create a mock creator object for the license modal
+    const creatorData = {
+      id: creatorId,
+      name: creatorGroup.creator.name,
+      avatar: creatorGroup.creator.avatar,
+      tags: creatorGroup.creator.tags || [],
+      restrictions: creatorGroup.creator.restrictions || [],
+      socialMediaConnected: true,
+      socialMediaType: 'Instagram',
+      contractSigned: true,
+      gallery: []
+    };
+
+    // Open license modal instead of navigating
+    // For now, navigate to gallery with selected items - TODO: implement license modal here
     navigate(`/profile/${creatorId}`, {
       state: {
-        selectedItems: creatorGroup.items.map(item => item.media_item_data.mediaItem),
+        selectedItems: selectedItems,
         fromCart: true
       }
     });

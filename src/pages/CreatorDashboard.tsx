@@ -1,82 +1,143 @@
-import React, { useState, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useAuth } from '@/contexts/AuthContext';
-import { mockCreators, mockRequests, mockBuyers } from '@/data/mockData';
-import { Camera, Instagram, Upload, DollarSign, Clock, CheckCircle, LogOut, User, Plus, X, FileText, AlertTriangle, Edit2 } from 'lucide-react';
-import ContractModal from '@/components/ContractModal';
+import { supabase } from '@/integrations/supabase/client';
+import { Camera, Instagram, LogOut, Plus, X, Euro, DollarSign, Upload, CheckCircle, AlertTriangle } from 'lucide-react';
 
 const CreatorDashboard = () => {
-  const { id } = useParams<{ id: string }>();
   const { user, logout } = useAuth();
-  const [dataVersion, setDataVersion] = useState(0);
+  const [creator, setCreator] = useState<any>(null);
+  const [mediaItems, setMediaItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   
-  // Find creator data from localStorage or mock data
-  const creator = useMemo(() => {
-    const storedCreators = localStorage.getItem('stockless_creators');
-    const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
-    return allCreators.find((c: any) => c.id === id) || allCreators[0];
-  }, [id, dataVersion]);
-
-  // Get requests for this creator
-  const creatorRequests = useMemo(() => {
-    const storedRequests = localStorage.getItem('stockless_requests');
-    const allRequests = storedRequests ? JSON.parse(storedRequests) : mockRequests;
-    return allRequests.filter((req: any) => req.creatorId === creator.id);
-  }, [creator.id, dataVersion]);
-
   // Profile editing state
   const [isEditing, setIsEditing] = useState(false);
   const [editedProfile, setEditedProfile] = useState({
-    name: creator.name,
-    tags: [...creator.tags],
-    restrictions: [...creator.restrictions],
+    name: '',
+    tags: [] as string[],
+    restrictions: [] as string[],
+    photo_price: 3.00,
+    video_price: 15.00,
   });
   const [newTag, setNewTag] = useState('');
   const [newRestriction, setNewRestriction] = useState('');
-  const [showContractModal, setShowContractModal] = useState(false);
-  const [showPhotoModal, setShowPhotoModal] = useState(false);
-  const [newAvatarUrl, setNewAvatarUrl] = useState('');
 
-  const handleSaveProfile = () => {
-    // Persist edits to mock DB (localStorage)
-    const storedCreators = localStorage.getItem('stockless_creators');
-    const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
-    const idx = allCreators.findIndex((c: any) => c.id === creator.id);
-    if (idx !== -1) {
-      allCreators[idx] = {
-        ...allCreators[idx],
+  // Fetch creator data and media items
+  useEffect(() => {
+    const fetchCreatorData = async () => {
+      if (!user) return;
+      
+      try {
+        // Fetch creator profile
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (profileError) {
+          console.error('Error fetching creator profile:', profileError);
+          return;
+        }
+
+        setCreator(profile);
+        setEditedProfile({
+          name: profile.name || '',
+          tags: profile.tags || [],
+          restrictions: profile.restrictions || [],
+          photo_price: profile.photo_price || 3.00,
+          video_price: profile.video_price || 15.00,
+        });
+
+        // Fetch media items
+        const { data: media, error: mediaError } = await supabase
+          .from('media_items')
+          .select('*')
+          .eq('creator_id', user.id)
+          .eq('is_available', true);
+
+        if (mediaError) {
+          console.error('Error fetching media items:', mediaError);
+          return;
+        }
+
+        setMediaItems(media || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCreatorData();
+  }, [user]);
+
+  const handleSaveProfile = async () => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          name: editedProfile.name,
+          tags: editedProfile.tags,
+          restrictions: editedProfile.restrictions,
+          photo_price: editedProfile.photo_price,
+          video_price: editedProfile.video_price,
+        })
+        .eq('id', user?.id);
+
+      if (error) {
+        console.error('Error updating profile:', error);
+        return;
+      }
+
+      // Update media items pricing
+      await Promise.all([
+        supabase
+          .from('media_items')
+          .update({ license_price: editedProfile.photo_price })
+          .eq('creator_id', user?.id)
+          .eq('media_type', 'image'),
+        supabase
+          .from('media_items')
+          .update({ license_price: editedProfile.video_price })
+          .eq('creator_id', user?.id)
+          .eq('media_type', 'video')
+      ]);
+
+      setCreator(prev => ({
+        ...prev,
         name: editedProfile.name,
         tags: editedProfile.tags,
         restrictions: editedProfile.restrictions,
-      };
-      localStorage.setItem('stockless_creators', JSON.stringify(allCreators));
+        photo_price: editedProfile.photo_price,
+        video_price: editedProfile.video_price,
+      }));
+      setIsEditing(false);
+      
+      // Refetch media items to show updated prices
+      const { data: media } = await supabase
+        .from('media_items')
+        .select('*')
+        .eq('creator_id', user?.id)
+        .eq('is_available', true);
+      setMediaItems(media || []);
+    } catch (error) {
+      console.error('Error saving profile:', error);
     }
-
-    // Keep users table in sync for header display/name
-    const storedUsers = localStorage.getItem('stockless_users');
-    const allUsers = storedUsers ? JSON.parse(storedUsers) : [];
-    const uIdx = allUsers.findIndex((u: any) => u.id === creator.id);
-    if (uIdx !== -1) {
-      allUsers[uIdx] = { ...allUsers[uIdx], name: editedProfile.name };
-      localStorage.setItem('stockless_users', JSON.stringify(allUsers));
-    }
-
-    setIsEditing(false);
-    setDataVersion((v) => v + 1);
   };
 
   const handleCancelEdit = () => {
     setEditedProfile({
       name: creator.name,
-      tags: [...creator.tags],
-      restrictions: [...creator.restrictions],
+      tags: [...(creator.tags || [])],
+      restrictions: [...(creator.restrictions || [])],
+      photo_price: creator.photo_price || 3.00,
+      video_price: creator.video_price || 15.00,
     });
     setIsEditing(false);
   };
@@ -115,68 +176,45 @@ const CreatorDashboard = () => {
     }));
   };
 
-  const totalEarnings = creatorRequests
-    .filter(req => req.status === 'Completed')
-    .reduce((sum, req) => sum + req.price, 0);
-
   const handleLogout = () => {
     logout();
   };
 
-  const handleConnectSocialMedia = () => {
-    if (!creator.contractSigned) {
-      setShowContractModal(true);
-    } else {
-      // Persist connection status to mock DB (localStorage)
-      const storedCreators = localStorage.getItem('stockless_creators');
-      const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
-      const idx = allCreators.findIndex((c: any) => c.id === creator.id);
-      if (idx !== -1) {
-        allCreators[idx] = { ...allCreators[idx], socialMediaConnected: true };
-        localStorage.setItem('stockless_creators', JSON.stringify(allCreators));
-      }
-      setDataVersion((v) => v + 1);
-    }
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const handleSignContract = () => {
-    // Update contractSigned in mock DB (localStorage)
-    const storedCreators = localStorage.getItem('stockless_creators');
-    const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
-    const idx = allCreators.findIndex((c: any) => c.id === creator.id);
-    if (idx !== -1) {
-      allCreators[idx] = { ...allCreators[idx], contractSigned: true };
-      localStorage.setItem('stockless_creators', JSON.stringify(allCreators));
-    }
-    setShowContractModal(false);
-    setDataVersion((v) => v + 1);
-  };
+  if (!creator) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Creator profile not found</h2>
+          <p className="text-muted-foreground">Please contact support if this issue persists.</p>
+        </div>
+      </div>
+    );
+  }
 
-  const handleSavePhoto = () => {
-    if (creator && newAvatarUrl.trim()) {
-      const storedCreators = localStorage.getItem('stockless_creators');
-      const allCreators = storedCreators ? JSON.parse(storedCreators) : mockCreators;
-      const idx = allCreators.findIndex((c: any) => c.id === creator.id);
-      if (idx !== -1) {
-        allCreators[idx] = { ...allCreators[idx], avatar: newAvatarUrl.trim() };
-        localStorage.setItem('stockless_creators', JSON.stringify(allCreators));
-      }
-      setShowPhotoModal(false);
-      setNewAvatarUrl('');
-      setDataVersion((v) => v + 1);
-    }
-  };
+  const photoItems = mediaItems.filter(item => item.media_type === 'image');
+  const videoItems = mediaItems.filter(item => item.media_type === 'video');
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
       {/* Header */}
-      <header style={{backgroundColor: "#1f1f1f"}} className="bg-white border-b border-border sticky top-0 z-50 shadow-soft">
+      <header className="bg-card border-b border-border sticky top-0 z-50 shadow-soft">
         <div className="container mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
               <Link to="/" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-white rounded-sm flex items-center justify-center">
-                  <span className="text-black font-bold text-lg">S</span>
+                <div className="w-8 h-8 bg-primary rounded-sm flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-lg">S</span>
                 </div>
                 <span className="text-xl font-bold">Stockless</span>
               </Link>
@@ -203,7 +241,7 @@ const CreatorDashboard = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Creator Dashboard</h1>
           <p className="text-muted-foreground">
-            Manage your profile, connect social media, and track licensing requests.
+            Manage your profile, set your prices, and track your content.
           </p>
         </div>
 
@@ -224,7 +262,7 @@ const CreatorDashboard = () => {
                       <Button variant="ghost" onClick={handleCancelEdit}>
                         Cancel
                       </Button>
-                      <Button variant="cta" onClick={handleSaveProfile}>
+                      <Button variant="default" onClick={handleSaveProfile}>
                         Save Changes
                       </Button>
                     </div>
@@ -233,25 +271,15 @@ const CreatorDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <img
-                      src={creator.avatar}
-                      alt={creator.name}
-                      className="w-16 h-16 rounded-full object-cover"
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full p-0"
-                      onClick={() => setShowPhotoModal(true)}
-                    >
-                      <Edit2 className="w-3 h-3" />
-                    </Button>
-                  </div>
+                  <img
+                    src={creator.avatar_url || '/default-avatar.png'}
+                    alt={creator.name}
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
                   <div>
                     <h3 className="font-semibold">{creator.name}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {creator.gallery.length} items in gallery
+                      {mediaItems.length} items in gallery
                     </p>
                   </div>
                 </div>
@@ -264,6 +292,52 @@ const CreatorDashboard = () => {
                     onChange={(e) => setEditedProfile(prev => ({ ...prev, name: e.target.value }))}
                     disabled={!isEditing}
                   />
+                </div>
+
+                {/* Pricing Section */}
+                <div className="space-y-4 p-4 bg-muted/20 rounded-lg border">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-primary" />
+                    <Label className="font-semibold">Content Pricing</Label>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="photo_price">Photo Price (€)</Label>
+                      <Input
+                        id="photo_price"
+                        type="number"
+                        min="0"
+                        max="5"
+                        step="0.50"
+                        value={editedProfile.photo_price}
+                        onChange={(e) => setEditedProfile(prev => ({ ...prev, photo_price: parseFloat(e.target.value) || 0 }))}
+                        disabled={!isEditing}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">Max €5.00</p>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="video_price">Video Price (€)</Label>
+                      <Input
+                        id="video_price"
+                        type="number"
+                        min="0"
+                        max="25"
+                        step="1"
+                        value={editedProfile.video_price}
+                        onChange={(e) => setEditedProfile(prev => ({ ...prev, video_price: parseFloat(e.target.value) || 0 }))}
+                        disabled={!isEditing}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">Max €25.00</p>
+                    </div>
+                  </div>
+                  
+                  <div className="text-sm text-muted-foreground">
+                    All your photos will be priced at €{editedProfile.photo_price.toFixed(2)} and videos at €{editedProfile.video_price.toFixed(2)}
+                  </div>
                 </div>
 
                 <div>
@@ -344,219 +418,97 @@ const CreatorDashboard = () => {
                     <div>
                       <p className="font-medium">Instagram</p>
                       <p className="text-sm text-muted-foreground">
-                        {creator.socialMediaConnected ? 'Connected' : 'Not connected'}
+                        {creator.social_media_connected ? 'Connected' : 'Not connected'}
                       </p>
                     </div>
                   </div>
-                  {creator.socialMediaConnected ? (
-                    <Badge variant="success">Connected</Badge>
+                  {creator.social_media_connected ? (
+                    <Badge variant="secondary" className="bg-success/10 text-success border-success/20">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      Connected
+                    </Badge>
                   ) : (
-                    <Button variant="cta" onClick={handleConnectSocialMedia}>
-                      Connect
-                    </Button>
+                    <Badge variant="secondary" className="bg-warning/10 text-warning border-warning/20">
+                      <AlertTriangle className="w-3 h-3 mr-1" />
+                      Not Connected
+                    </Badge>
                   )}
                 </div>
-                
-                {!creator.contractSigned && (
-                  <div className="mt-4 p-3 bg-warning/10 rounded-lg border border-warning/20">
-                    <div className="flex items-start gap-2">
-                      <AlertTriangle className="w-4 h-4 text-warning mt-0.5" />
-                      <div className="text-sm">
-                        <p className="font-medium text-warning mb-1">Contract Required</p>
-                        <p className="text-muted-foreground mb-2">
-                          You must sign the Estonian licensing contract before connecting social media.
-                        </p>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => setShowContractModal(true)}
-                        >
-                          <FileText className="w-3 h-3 mr-1" />
-                          View Contract
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                {creator.contractSigned && (
-                  <div className="mt-4 p-3 bg-success/10 rounded-lg border border-success/20">
-                    <div className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-success mt-0.5" />
-                      <div className="text-sm">
-                        <p className="font-medium text-success mb-1">Contract Signed</p>
-                        <p className="text-muted-foreground mb-2">
-                          Estonian licensing contract has been signed and is active.
-                        </p>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => setShowContractModal(true)}
-                        >
-                          <FileText className="w-3 h-3 mr-1" />
-                          View Contract
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                <p className="text-sm text-muted-foreground mt-3">
-                  {creator.socialMediaConnected 
-                    ? `Synced ${creator.gallery.length} items from your Instagram account.`
-                    : creator.contractSigned 
-                      ? 'Ready to connect your Instagram account.'
-                      : 'Sign the contract to enable Instagram connection.'
-                  }
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* License Requests */}
-            <Card className="shadow-medium border-0">
-              <CardHeader>
-                <CardTitle>License Requests</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {creatorRequests.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="font-medium mb-2">No requests yet</h3>
-                    <p className="text-sm text-muted-foreground">
-                      License requests will appear here when buyers request your content.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {creatorRequests.map((request) => {
-                      const buyer = mockBuyers.find(b => b.id === request.buyerId);
-                      return (
-                        <div key={request.id} className="border rounded-lg p-4">
-                          <div className="flex justify-between items-start mb-3">
-                            <div>
-                              <p className="font-medium">{buyer?.name || 'Unknown Buyer'}</p>
-                              <p className="text-sm text-muted-foreground">
-                                Requested {request.media.length} items • {request.createdAt}
-                              </p>
-                            </div>
-                            <Badge 
-                              variant={request.status === 'Completed' ? 'success' : 'secondary'}
-                            >
-                              {request.status}
-                            </Badge>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-4 text-sm mb-3">
-                            <div>
-                              <span className="text-muted-foreground">Media:</span>
-                              <span className="ml-2">{request.licenseTerms.mediaType}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Editing:</span>
-                              <span className="ml-2">{request.licenseTerms.editingRights ? 'Allowed' : 'Not allowed'}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Duration:</span>
-                              <span className="ml-2">{request.licenseTerms.duration}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Price:</span>
-                              <span className="ml-2 font-medium text-success">${request.price}</span>
-                            </div>
-                          </div>
-                          
-                          {request.status === 'Pending' && (
-                            <div className="flex gap-2">
-                              <Button variant="cta" size="sm">
-                                <Upload className="w-4 h-4 mr-2" />
-                                Upload Originals
-                              </Button>
-                              <Button variant="outline" size="sm">
-                                View Details
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
               </CardContent>
             </Card>
           </div>
 
-          {/* Right Column - Stats & Gallery */}
+          {/* Right Column - Stats & Gallery Preview */}
           <div className="space-y-6">
-            {/* Earnings Card */}
+            {/* Stats Cards */}
             <Card className="shadow-medium border-0">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="w-5 h-5" />
-                  Earnings
-                </CardTitle>
+                <CardTitle>Content Overview</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-muted/20 rounded">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Photos</p>
+                    <p className="text-2xl font-bold">{photoItems.length}</p>
+                    <p className="text-xs text-muted-foreground">€{creator.photo_price?.toFixed(2)} each</p>
+                  </div>
+                  <Camera className="w-8 h-8 text-muted-foreground" />
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-muted/20 rounded">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Videos</p>
+                    <p className="text-2xl font-bold">{videoItems.length}</p>
+                    <p className="text-xs text-muted-foreground">€{creator.video_price?.toFixed(2)} each</p>
+                  </div>
+                  <Upload className="w-8 h-8 text-muted-foreground" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Gallery Preview */}
+            <Card className="shadow-medium border-0">
+              <CardHeader>
+                <CardTitle>Gallery Preview</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-success mb-2">
-                    ${totalEarnings}
+                {mediaItems.length > 0 ? (
+                  <div className="grid grid-cols-3 gap-2">
+                    {mediaItems.slice(0, 9).map((item) => (
+                      <div key={item.id} className="relative aspect-square">
+                        {item.media_type === 'video' ? (
+                          <video
+                            src={item.full_url}
+                            className="w-full h-full object-cover rounded border"
+                            muted
+                            loop
+                          />
+                        ) : (
+                          <img
+                            src={item.thumbnail_url}
+                            alt={item.title || item.caption}
+                            className="w-full h-full object-cover rounded border"
+                          />
+                        )}
+                        <div className="absolute bottom-1 right-1 bg-black/70 px-1 py-0.5 rounded text-xs text-white">
+                          €{item.license_price}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    From {creatorRequests.filter(r => r.status === 'Completed').length} completed licenses
-                  </p>
-                </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Upload className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="font-medium mb-2">No content yet</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Connect your Instagram to sync your content.
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
         </div>
-        
-        {/* Contract Modal */}
-        <ContractModal
-          isOpen={showContractModal}
-          onClose={() => setShowContractModal(false)}
-          onSign={handleSignContract}
-          creatorName={creator.name}
-        />
-
-        {/* Photo Change Modal */}
-        <Dialog open={showPhotoModal} onOpenChange={setShowPhotoModal}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Change Profile Photo</DialogTitle>
-              <DialogDescription>
-                Enter the URL of your new profile photo
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="avatar-url">Photo URL</Label>
-                <Input
-                  id="avatar-url"
-                  placeholder="https://example.com/your-photo.jpg"
-                  value={newAvatarUrl}
-                  onChange={(e) => setNewAvatarUrl(e.target.value)}
-                />
-              </div>
-              {newAvatarUrl && (
-                <div className="flex justify-center">
-                  <img
-                    src={newAvatarUrl}
-                    alt="Preview"
-                    className="w-20 h-20 rounded-full object-cover"
-                    onError={() => {}}
-                  />
-                </div>
-              )}
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowPhotoModal(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleSavePhoto} disabled={!newAvatarUrl.trim()}>
-                Save Photo
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </main>
     </div>
   );
