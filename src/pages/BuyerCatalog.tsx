@@ -194,7 +194,7 @@ const BuyerCatalog = () => {
                     )}
                   </div>
                   
-                  <Button asChild variant="cta" className="w-full">
+                  <Button asChild variant="gradient-outline" className="w-full">
                     <Link to={`/profile/${creator.id}`}>
                       <Eye className="w-4 h-4 mr-2" />
                       View Gallery

@@ -20,6 +20,7 @@ const buttonVariants = cva(
         creator: "bg-gradient-card text-white hover:scale-105 shadow-soft hover:shadow-medium",
         minimal: "bg-transparent text-foreground hover:bg-muted border border-border hover:border-primary/20",
         success: "bg-success text-success-foreground hover:bg-success/90 shadow-soft",
+        "gradient-outline": "bg-transparent text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light border-2 border-transparent bg-gradient-to-r from-primary to-primary-light bg-origin-border hover:shadow-lg hover:scale-105 transition-all duration-200",
       },
       size: {
         default: "h-10 px-4 py-2",

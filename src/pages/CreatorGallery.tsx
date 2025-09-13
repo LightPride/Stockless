@@ -210,7 +210,7 @@ const CreatorGallery = () => {
             </div>
             
             <Button
-              variant="cta"
+              variant="gradient-outline"
               onClick={handleLicenseRequest}
               disabled={selectedMedia.length === 0}
               className="min-w-48"
