@@ -32,13 +32,13 @@ const Landing = () => {
       <section className="py-24 px-6">
         <div className="container mx-auto text-center max-w-4xl">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-hero bg-clip-text text-transparent">
-            License real content,
+            Trade content easily.
             <br />
-            directly from creators
+            Reduce legal hustle.
           </h1>
           <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
             Find content. License it. Simple. Get authentic creator content with full protection - 
-            no direct contact needed, complete privacy for both parties.
+            no direct contact needed.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
