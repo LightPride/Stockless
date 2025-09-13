@@ -44,7 +44,7 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose }) => {
     if (!creatorGroup) return;
 
     // Navigate to creator gallery with selected items
-    navigate(`/gallery/${creatorId}`, {
+    navigate(`/profile/${creatorId}`, {
       state: {
         selectedItems: creatorGroup.items.map(item => item.media_item_data.mediaItem),
         fromCart: true
