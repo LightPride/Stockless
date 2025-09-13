@@ -37,8 +37,8 @@ const Landing = () => {
             Reduce legal hustle.
           </h1>
           <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-            Find content. License it. Simple. Get authentic creator content with full protection - 
-            no direct contact needed.
+            Connect creators and brands seamlessly. Monetize your content or find authentic visuals - 
+            all with full legal protection and no direct contact needed.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
@@ -82,9 +82,9 @@ const Landing = () => {
               <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-white font-bold text-lg">1</span>
               </div>
-              <h3 className="text-xl font-semibold mb-4">Browse Creators</h3>
+              <h3 className="text-xl font-semibold mb-4">Connect & Discover</h3>
               <p className="text-muted-foreground">
-                Discover authentic content from verified creators. Filter by style, restrictions, and usage rights.
+                Creators showcase their work in private galleries. Brands discover authentic content with clear usage rights and restrictions.
               </p>
             </Card>
 
@@ -92,9 +92,9 @@ const Landing = () => {
               <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-white font-bold text-lg">2</span>
               </div>
-              <h3 className="text-xl font-semibold mb-4">Pick Content</h3>
+              <h3 className="text-xl font-semibold mb-4">Choose & Set Terms</h3>
               <p className="text-muted-foreground">
-                Select the perfect images or videos from private creator galleries. See usage restrictions upfront.
+                Creators set pricing and usage terms. Brands select content that fits their needs and budget perfectly.
               </p>
             </Card>
 
@@ -102,9 +102,9 @@ const Landing = () => {
               <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-white font-bold text-lg">3</span>
               </div>
-              <h3 className="text-xl font-semibold mb-4">License Instantly</h3>
+              <h3 className="text-xl font-semibold mb-4">Earn & License Instantly</h3>
               <p className="text-muted-foreground">
-                AI-powered contracts, instant licensing, immediate download. Get what you need, when you need it.
+                Creators earn from their work while brands get instant access. AI-powered contracts protect both parties throughout the process.
               </p>
             </Card>
           </div>
