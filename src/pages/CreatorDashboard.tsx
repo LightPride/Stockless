@@ -180,6 +180,67 @@ const CreatorDashboard = () => {
     logout();
   };
 
+  const handleSignContract = async () => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ contract_signed: true })
+        .eq('id', user?.id);
+
+      if (error) {
+        console.error('Error signing contract:', error);
+        return;
+      }
+
+      setCreator(prev => ({ ...prev, contract_signed: true }));
+    } catch (error) {
+      console.error('Error signing contract:', error);
+    }
+  };
+
+  const handleConnectInstagram = async () => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          social_media_connected: true,
+          social_media_type: 'Instagram'
+        })
+        .eq('id', user?.id);
+
+      if (error) {
+        console.error('Error connecting Instagram:', error);
+        return;
+      }
+
+      setCreator(prev => ({ 
+        ...prev, 
+        social_media_connected: true,
+        social_media_type: 'Instagram'
+      }));
+    } catch (error) {
+      console.error('Error connecting Instagram:', error);
+    }
+  };
+
+  const handleDisconnectInstagram = async () => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ social_media_connected: false })
+        .eq('id', user?.id);
+
+      if (error) {
+        console.error('Error disconnecting Instagram:', error);
+        return;
+      }
+
+      setCreator(prev => ({ ...prev, social_media_connected: false }));
+    } catch (error) {
+      console.error('Error disconnecting Instagram:', error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
@@ -406,32 +467,87 @@ const CreatorDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Social Media Connection */}
+            {/* Contract & Social Media */}
             <Card className="shadow-medium border-0">
               <CardHeader>
-                <CardTitle>Social Media Connection</CardTitle>
+                <CardTitle>Contract & Instagram</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <Instagram className="w-6 h-6 text-pink-500" />
-                    <div>
-                      <p className="font-medium">Instagram</p>
-                      <p className="text-sm text-muted-foreground">
-                        {creator.social_media_connected ? 'Connected' : 'Not connected'}
-                      </p>
+              <CardContent className="space-y-4">
+                {/* Contract Section */}
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <CheckCircle className={`w-6 h-6 ${creator.contract_signed ? 'text-success' : 'text-muted-foreground'}`} />
+                      <div>
+                        <p className="font-medium">Platform Contract</p>
+                        <p className="text-sm text-muted-foreground">
+                          {creator.contract_signed ? 'Contract signed' : 'Sign to start earning'}
+                        </p>
+                      </div>
                     </div>
+                    {creator.contract_signed ? (
+                      <Badge variant="secondary" className="bg-success/10 text-success border-success/20">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Signed
+                      </Badge>
+                    ) : (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleSignContract()}
+                      >
+                        Sign Contract
+                      </Button>
+                    )}
                   </div>
-                  {creator.social_media_connected ? (
-                    <Badge variant="secondary" className="bg-success/10 text-success border-success/20">
-                      <CheckCircle className="w-3 h-3 mr-1" />
-                      Connected
-                    </Badge>
-                  ) : (
-                    <Badge variant="secondary" className="bg-warning/10 text-warning border-warning/20">
-                      <AlertTriangle className="w-3 h-3 mr-1" />
-                      Not Connected
-                    </Badge>
+                  {!creator.contract_signed && (
+                    <p className="text-xs text-muted-foreground">
+                      You must sign the platform contract before connecting social media.
+                    </p>
+                  )}
+                </div>
+
+                {/* Instagram Connection */}
+                <div className={`p-4 border rounded-lg ${!creator.contract_signed ? 'opacity-50 pointer-events-none' : ''}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <Instagram className="w-6 h-6 text-pink-500" />
+                      <div>
+                        <p className="font-medium">Instagram</p>
+                        <p className="text-sm text-muted-foreground">
+                          {creator.social_media_connected ? 'Connected' : 'Connect to sync content'}
+                        </p>
+                      </div>
+                    </div>
+                    {creator.social_media_connected ? (
+                      <div className="flex gap-2">
+                        <Badge variant="secondary" className="bg-success/10 text-success border-success/20">
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Connected
+                        </Badge>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDisconnectInstagram()}
+                        >
+                          Disconnect
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        disabled={!creator.contract_signed}
+                        onClick={() => handleConnectInstagram()}
+                      >
+                        Connect Instagram
+                      </Button>
+                    )}
+                  </div>
+                  {creator.contract_signed && !creator.social_media_connected && (
+                    <p className="text-xs text-muted-foreground">
+                      Connect Instagram to automatically sync your content to our platform.
+                    </p>
                   )}
                 </div>
               </CardContent>

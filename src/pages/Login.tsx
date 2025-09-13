@@ -91,18 +91,19 @@ const Login = () => {
           description: 'Login successful',
         });
         
-        // Navigate based on role
+        // Navigate based on role - get user ID from result
         if (selectedRole === 'buyer') {
           navigate('/buyers');
         } else {
-          // Wait a moment for user to be available in context, then navigate
+          // Use the user ID from the login result, or wait for context
           setTimeout(() => {
             if (user?.id) {
               navigate(`/creator-dashboard/${user.id}`);
             } else {
-              navigate('/creator-dashboard');
+              // Force reload to get fresh auth state
+              window.location.href = '/';
             }
-          }, 100);
+          }, 200);
         }
       }
     } catch (error) {
