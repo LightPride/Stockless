@@ -35,6 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             role: (session.user.user_metadata?.role || 'buyer') as 'buyer' | 'creator',
             name: session.user.user_metadata?.name || session.user.email || 'Unknown'
           };
+          console.log('Setting user in auth context:', localUser);
           setUser(localUser);
         } else {
           setUser(null);
