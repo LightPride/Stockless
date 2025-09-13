@@ -17,12 +17,13 @@ const Landing = () => {
     'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=400&fit=crop'
   ];
 
-  const floatingPhotos = [
-    { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop', delay: '0s', x: '10%', y: '15%' },
-    { src: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=250&h=300&fit=crop', delay: '1s', x: '25%', y: '60%' },
-    { src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=280&h=180&fit=crop', delay: '2s', x: '5%', y: '75%' },
-    { src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=320&h=240&fit=crop', delay: '0.5s', x: '35%', y: '25%' },
-    { src: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=200&h=300&fit=crop', delay: '1.5s', x: '15%', y: '40%' },
+  const ladderPhotos = [
+    { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=120&h=120&fit=crop' },
+    { src: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=120&h=120&fit=crop' },
+    { src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=120&h=120&fit=crop' },
+    { src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=120&h=120&fit=crop' },
+    { src: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=120&h=120&fit=crop' },
+    { src: 'https://images.unsplash.com/photo-1463100099107-aa0980c362e6?w=120&h=120&fit=crop' },
   ];
 
   return (
@@ -51,26 +52,25 @@ const Landing = () => {
 
       {/* Hero Section */}
       <section className="py-24 px-6 bg-gradient-subtle relative overflow-hidden">
-        {/* Animated Photo Grid Background */}
-        <div className="absolute left-0 top-0 w-1/2 h-full overflow-hidden opacity-20">
-          {floatingPhotos.map((photo, index) => (
-            <div
-              key={index}
-              className={`absolute hover:scale-110 transition-all duration-500 cursor-pointer ${
-                index % 2 === 0 ? 'animate-float' : 'animate-float-delayed'
-              }`}
-              style={{
-                left: photo.x,
-                top: photo.y,
-              }}
-            >
-              <img
-                src={photo.src}
-                alt={`Floating photo ${index + 1}`}
-                className="rounded-lg shadow-lg hover:shadow-2xl transition-all duration-500 hover:rotate-1"
-              />
-            </div>
-          ))}
+        {/* Ladder Photo Layout */}
+        <div className="absolute left-8 top-1/2 transform -translate-y-1/2 opacity-30">
+          <div className="flex flex-col space-y-4">
+            {ladderPhotos.map((photo, index) => (
+              <div
+                key={index}
+                className="transition-all duration-300 hover:scale-110 cursor-pointer"
+                style={{
+                  marginLeft: `${index * 20}px`
+                }}
+              >
+                <img
+                  src={photo.src}
+                  alt={`Gallery photo ${index + 1}`}
+                  className="w-24 h-24 rounded-lg shadow-lg hover:shadow-2xl object-cover"
+                />
+              </div>
+            ))}
+          </div>
         </div>
         <div className="container mx-auto text-center max-w-4xl relative z-10">
           <h1 className="text-5xl md:text-6xl font-bold mb-8 text-foreground">
