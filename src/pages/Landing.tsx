@@ -32,13 +32,13 @@ const Landing = () => {
       <section className="py-24 px-6">
         <div className="container mx-auto text-center max-w-4xl">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-hero bg-clip-text text-transparent">
-            Trade content easily.
+            License real content,
             <br />
-            Reduce legal hustle.
+            directly from creators
           </h1>
           <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-            Connect creators and brands seamlessly. Monetize your content or find authentic visuals - 
-            all with full legal protection and no direct contact needed.
+            Find content. License it. Simple. Get authentic creator content with full protection - 
+            no direct contact needed, complete privacy for both parties.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
@@ -82,9 +82,9 @@ const Landing = () => {
               <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-white font-bold text-lg">1</span>
               </div>
-              <h3 className="text-xl font-semibold mb-4">Connect & Discover</h3>
+              <h3 className="text-xl font-semibold mb-4">Browse Creators</h3>
               <p className="text-muted-foreground">
-                Creators showcase their work in private galleries. Brands discover authentic content with clear usage rights and restrictions.
+                Discover authentic content from verified creators. Filter by style, restrictions, and usage rights.
               </p>
             </Card>
 
@@ -92,9 +92,9 @@ const Landing = () => {
               <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-white font-bold text-lg">2</span>
               </div>
-              <h3 className="text-xl font-semibold mb-4">Choose & Set Terms</h3>
+              <h3 className="text-xl font-semibold mb-4">Pick Content</h3>
               <p className="text-muted-foreground">
-                Creators set pricing and usage terms. Brands select content that fits their needs and budget perfectly.
+                Select the perfect images or videos from private creator galleries. See usage restrictions upfront.
               </p>
             </Card>
 
@@ -102,9 +102,9 @@ const Landing = () => {
               <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-white font-bold text-lg">3</span>
               </div>
-              <h3 className="text-xl font-semibold mb-4">Earn & License Instantly</h3>
+              <h3 className="text-xl font-semibold mb-4">License Instantly</h3>
               <p className="text-muted-foreground">
-                Creators earn from their work while brands get instant access. AI-powered contracts protect both parties throughout the process.
+                AI-powered contracts, instant licensing, immediate download. Get what you need, when you need it.
               </p>
             </Card>
           </div>
@@ -116,7 +116,7 @@ const Landing = () => {
         <div className="container mx-auto text-center max-w-3xl">
           <h2 className="text-4xl font-bold mb-6">Ready to get started?</h2>
           <p className="text-xl mb-10 text-white/90">
-            Join thousands of creators and brands using Stockless for authentic content licensing.
+            Join thousands of creators and TV producers using Stockless for authentic content licensing.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="outline" size="lg" asChild className="bg-white text-primary hover:bg-white/90 border-white min-w-48">
