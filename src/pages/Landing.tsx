@@ -105,7 +105,7 @@ const Landing = () => {
             <span className="block text-primary"> from creators</span>
           </h1>
           <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-            Authentic videos and photoes from creators with transparent licencing and instant delivery.
+            Authentic videos and photos with transparent licencing and instant delivery.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
