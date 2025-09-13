@@ -12,7 +12,7 @@ import { ArrowLeft, Users, Camera } from 'lucide-react';
 const Login = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { login, register, isAuthenticated } = useAuth();
+  const { login, register, isAuthenticated, user } = useAuth();
   const { toast } = useToast();
   
   const [email, setEmail] = useState('');
@@ -95,7 +95,14 @@ const Login = () => {
         if (selectedRole === 'buyer') {
           navigate('/buyers');
         } else {
-          navigate('/creator-dashboard');
+          // Wait a moment for user to be available in context, then navigate
+          setTimeout(() => {
+            if (user?.id) {
+              navigate(`/creator-dashboard/${user.id}`);
+            } else {
+              navigate('/creator-dashboard');
+            }
+          }, 100);
         }
       }
     } catch (error) {
