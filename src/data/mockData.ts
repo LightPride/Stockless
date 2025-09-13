@@ -85,7 +85,7 @@ export const mockCreators: Creator[] = [
         id: 'media3',
         thumb: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=640&h=640&fit=crop',
         permalink: 'https://instagram.com/p/FAKE125',
-        caption: 'Running at dawn'
+        caption: 'Physical training'
       },
       {
         id: 'media4',
@@ -97,7 +97,7 @@ export const mockCreators: Creator[] = [
         id: 'media5',
         thumb: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=640&h=640&fit=crop',
         permalink: 'https://instagram.com/p/FAKE127',
-        caption: 'Ocean sunset'
+        caption: 'Mountain peaks'
       },
       {
         id: 'media6',
@@ -112,7 +112,7 @@ export const mockCreators: Creator[] = [
     name: 'Bob Wilson',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
     tags: ['Fashion', 'Lifestyle', 'Urban', 'Memes', 'Comedy', 'Entertainment'],
-    restrictions: ['Not for competitors'],
+    restrictions: ['Not for ads'],
     socialMediaConnected: true,
     socialMediaType: 'Instagram',
     contractSigned: true,
@@ -127,13 +127,13 @@ export const mockCreators: Creator[] = [
         id: 'media8',
         thumb: 'https://images.unsplash.com/photo-1463100099107-aa0980c362e6?w=640&h=640&fit=crop',
         permalink: 'https://instagram.com/p/FAKE130',
-        caption: 'Urban coffee'
+        caption: 'Converse commercial'
       },
       {
         id: 'media9',
         thumb: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=640&h=640&fit=crop',
         permalink: 'https://instagram.com/p/FAKE131',
-        caption: 'City lights'
+        caption: 'Posing girl'
       }
     ]
   },
@@ -163,7 +163,7 @@ export const mockCreators: Creator[] = [
         id: 'media12',
         thumb: 'https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?w=640&h=640&fit=crop',
         permalink: 'https://instagram.com/p/FAKE134',
-        caption: 'Travel memories'
+        caption: 'Cup of coffee'
       }
     ]
   },
