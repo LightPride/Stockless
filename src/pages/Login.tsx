@@ -54,53 +54,49 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      let success;
+      let result;
       
       if (isRegister) {
-        success = await register(email, password, selectedRole, name);
+        result = await register(email, password, selectedRole, name);
         
-        if (!success) {
+        if (!result.success) {
           toast({
             title: 'Registration failed',
-            description: 'User with this email already exists',
+            description: result.error || 'User with this email already exists',
             variant: 'destructive'
           });
           setIsLoading(false);
           return;
         }
-      } else {
-        success = await login(email, password, selectedRole);
-      }
-      
-      if (success) {
-        // Decode token to get the authenticated user's id and role
-        const token = localStorage.getItem('stockless_access_token');
-        let targetRole = selectedRole;
-        let targetId: string | null = null;
-        if (token) {
-          try {
-            const payload = JSON.parse(atob(token));
-            targetRole = payload.role;
-            targetId = payload.sub;
-          } catch {}
-        }
-
+        
         toast({
-          title: isRegister ? 'Account created!' : 'Welcome back!',
-          description: isRegister ? 'Registration successful' : 'Login successful',
+          title: 'Account created!',
+          description: 'Registration successful. Please check your email to confirm your account.',
+        });
+      } else {
+        result = await login(email, password, selectedRole);
+        
+        if (!result.success) {
+          toast({
+            title: 'Login failed',
+            description: result.error || 'Invalid credentials or role mismatch',
+            variant: 'destructive'
+          });
+          setIsLoading(false);
+          return;
+        }
+        
+        toast({
+          title: 'Welcome back!',
+          description: 'Login successful',
         });
         
-        if (targetRole === 'buyer') {
+        // Navigate based on role
+        if (selectedRole === 'buyer') {
           navigate('/buyers');
         } else {
-          navigate(`/creator-dashboard/${targetId || 'creator1'}`);
+          navigate('/creator-dashboard');
         }
-      } else {
-        toast({
-          title: isRegister ? 'Registration failed' : 'Login failed',
-          description: isRegister ? 'Something went wrong' : 'Invalid credentials or role mismatch',
-          variant: 'destructive'
-        });
       }
     } catch (error) {
       toast({
