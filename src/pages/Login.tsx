@@ -136,8 +136,8 @@ const Login = () => {
           </Button>
           
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-8 h-8 bg-gradient-hero rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">S</span>
+            <div className="w-8 h-8 bg-white rounded-sm flex items-center justify-center">
+              <span className="text-black font-bold text-lg">S</span>
             </div>
             <span className="text-xl font-bold">Stockless</span>
           </div>

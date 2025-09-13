@@ -175,8 +175,8 @@ const CreatorDashboard = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
               <Link to="/" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-hero rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">S</span>
+                <div className="w-8 h-8 bg-white rounded-sm flex items-center justify-center">
+                  <span className="text-black font-bold text-lg">S</span>
                 </div>
                 <span className="text-xl font-bold">Stockless</span>
               </Link>

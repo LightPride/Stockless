@@ -90,8 +90,8 @@ const BuyerCatalog = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
               <Link to="/" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-hero rounded-sm flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">S</span>
+                <div className="w-8 h-8 bg-white rounded-sm flex items-center justify-center">
+                  <span className="text-black font-bold text-lg">S</span>
                 </div>
                 <span className="text-xl font-bold text-foreground">Stockless</span>
               </Link>
@@ -166,12 +166,27 @@ const BuyerCatalog = () => {
           {filteredCreators.map((creator) => (
             <Card key={creator.id} className="overflow-hidden hover:shadow-md smooth-transition group">
               <div className="relative h-64 overflow-hidden">
-                <img
-                  src={creator.avatar}
-                  alt={creator.name}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                {/* Gallery preview grid */}
+                <div className="grid grid-cols-2 h-full">
+                  {creator.gallery.slice(0, 4).map((item, index) => (
+                    <div 
+                      key={item.id} 
+                      className={`relative overflow-hidden ${index >= 2 ? 'hidden' : ''}`}
+                    >
+                      <img
+                        src={item.thumbnail}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                  ))}
+                  {creator.gallery.length < 2 && (
+                    <div className="bg-muted flex items-center justify-center">
+                      <span className="text-muted-foreground text-sm">No content</span>
+                    </div>
+                  )}
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                 
                 {creator.socialMediaConnected && (
                   <Badge variant="success" className="absolute top-3 right-3 text-xs">

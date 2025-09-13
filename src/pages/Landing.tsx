@@ -11,9 +11,9 @@ const Landing = () => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-hero rounded-sm flex items-center justify-center">
-                <span className="text-white font-bold text-lg">S</span>
-              </div>
+            <div className="w-8 h-8 bg-white rounded-sm flex items-center justify-center">
+              <span className="text-black font-bold text-lg">S</span>
+            </div>
               <span className="text-xl font-bold text-foreground">Stockless</span>
             </div>
             <div className="flex gap-4">
@@ -137,8 +137,8 @@ const Landing = () => {
       <footer className="py-12 px-6 bg-card border-t border-border">
         <div className="container mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-6 h-6 bg-gradient-hero rounded-sm flex items-center justify-center">
-              <span className="text-white font-bold text-sm">S</span>
+            <div className="w-6 h-6 bg-white rounded-sm flex items-center justify-center">
+              <span className="text-black font-bold text-sm">S</span>
             </div>
             <span className="font-semibold text-foreground">Stockless</span>
           </div>
