@@ -107,6 +107,7 @@ export type Database = {
           contract_signed: boolean | null
           created_at: string | null
           id: string
+          is_demo: boolean | null
           name: string
           restrictions: string[] | null
           role: string
@@ -121,6 +122,7 @@ export type Database = {
           contract_signed?: boolean | null
           created_at?: string | null
           id: string
+          is_demo?: boolean | null
           name: string
           restrictions?: string[] | null
           role: string
@@ -135,6 +137,7 @@ export type Database = {
           contract_signed?: boolean | null
           created_at?: string | null
           id?: string
+          is_demo?: boolean | null
           name?: string
           restrictions?: string[] | null
           role?: string
