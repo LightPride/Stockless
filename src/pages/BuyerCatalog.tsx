@@ -206,40 +206,42 @@ const BuyerCatalog = () => {
                     </div>
                   )}
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                 
                 {creator.socialMediaConnected && (
                   <Badge variant="success" className="absolute top-3 right-3 text-xs">
                     Connected
                   </Badge>
                 )}
-                
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <div className="backdrop-blur-sm bg-black/30 rounded-lg p-3 mb-3">
-                    <h3 className="text-xl font-semibold text-white">{creator.name}</h3>
-                  </div>
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    {creator.tags.slice(0, 3).map(tag => (
-                      <Badge key={tag} variant="outline" className="text-xs bg-white/20 border-white/30 text-white">
-                        {tag}
-                      </Badge>
-                    ))}
-                    {creator.tags.length > 3 && (
-                      <Badge variant="outline" className="text-xs bg-white/20 border-white/30 text-white">
-                        +{creator.tags.length - 3}
-                      </Badge>
-                    )}
-                  </div>
-                  
-                  <Button asChild variant="gradient-outline" className="w-full">
-                    <Link to={`/profile/${creator.id}`}>
-                      <Eye className="w-4 h-4 mr-2" />
-                      View Gallery
-                    </Link>
-                  </Button>
-                </div>
               </div>
 
+              {/* Creator Info Section */}
+              <CardContent className="p-4 space-y-3">
+                <div>
+                  <h3 className="text-lg font-semibold">{creator.name}</h3>
+                </div>
+                
+                <div className="flex flex-wrap gap-1">
+                  {creator.tags.slice(0, 3).map(tag => (
+                    <Badge key={tag} variant="secondary" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                  {creator.tags.length > 3 && (
+                    <Badge variant="secondary" className="text-xs">
+                      +{creator.tags.length - 3}
+                    </Badge>
+                  )}
+                </div>
+                
+                <Button asChild variant="gradient-outline" className="w-full">
+                  <Link to={`/profile/${creator.id}`}>
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Gallery
+                  </Link>
+                </Button>
+              </CardContent>
+
+              {/* Restrictions Section */}
               {creator.restrictions.length > 0 && (
                 <div className="p-3 bg-warning/10 text-xs text-muted-foreground border-t border-border">
                   <span className="font-medium">Restrictions: </span>
