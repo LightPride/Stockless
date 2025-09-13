@@ -4,19 +4,24 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import CartIcon from '@/components/CartIcon';
+import CartModal from '@/components/CartModal';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 import { mockCreators, MediaItem } from '@/data/mockData';
-import { ArrowLeft, ExternalLink, Check, User, AlertCircle } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Check, User, AlertCircle, Plus, LogOut } from 'lucide-react';
 import LicenseModal from '@/components/LicenseModal';
 
 const CreatorGallery = () => {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const { addToCart } = useCart();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
   const [selectedMedia, setSelectedMedia] = useState<string[]>([]);
   const [showLicenseModal, setShowLicenseModal] = useState(false);
+  const [showCartModal, setShowCartModal] = useState(false);
 
   const creator = useMemo(() => {
     return mockCreators.find(c => c.id === id);
@@ -52,6 +57,17 @@ const CreatorGallery = () => {
 
   const openInstagramPost = (permalink: string) => {
     window.open(permalink, '_blank');
+  };
+
+  const handleAddToCart = async (item: MediaItem) => {
+    if (creator) {
+      await addToCart(item, creator);
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   const handleLicenseRequest = () => {
@@ -90,6 +106,11 @@ const CreatorGallery = () => {
               <span className="text-sm text-muted-foreground">
                 {selectedMedia.length} selected
               </span>
+              <CartIcon onClick={() => setShowCartModal(true)} />
+              <Button variant="ghost" onClick={handleLogout}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
             </div>
           </div>
         </div>
@@ -186,6 +207,18 @@ const CreatorGallery = () => {
                   <ExternalLink className="w-3 h-3 text-white" />
                 </button>
 
+                {/* Add to Cart Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAddToCart(item);
+                  }}
+                  className="absolute bottom-2 right-2 bg-primary text-primary-foreground p-1.5 rounded-sm hover:bg-primary/80 smooth-transition opacity-0 group-hover:opacity-100"
+                  title="Add to cart"
+                >
+                  <Plus className="w-3 h-3" />
+                </button>
+
                 {/* Selection Overlay */}
                 {selectedMedia.includes(item.id) && (
                   <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
@@ -235,6 +268,8 @@ const CreatorGallery = () => {
           onClose={() => setShowLicenseModal(false)}
         />
       )}
+
+      <CartModal isOpen={showCartModal} onClose={() => setShowCartModal(false)} />
     </div>
   );
 };

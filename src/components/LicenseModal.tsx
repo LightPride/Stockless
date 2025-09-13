@@ -33,6 +33,7 @@ interface LicenseTerms {
   editingRights: boolean;
   duration: string;
   exclusivity: boolean;
+  region: string;
 }
 
 const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onClose }) => {
@@ -45,6 +46,7 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onC
     editingRights: false,
     duration: '12 months',
     exclusivity: false,
+    region: 'worldwide',
   });
 
   const calculatePrice = () => {
@@ -177,6 +179,28 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onC
                       <SelectItem value="6 months">6 months</SelectItem>
                       <SelectItem value="12 months">12 months</SelectItem>
                       <SelectItem value="24 months">24 months</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="region" className="text-sm font-medium text-foreground">Usage Region</Label>
+                  <Select 
+                    value={licenseTerms.region} 
+                    onValueChange={(value) => 
+                      setLicenseTerms(prev => ({ ...prev, region: value }))
+                    }
+                  >
+                    <SelectTrigger className="bg-input border-border text-foreground">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border-border">
+                      <SelectItem value="worldwide">Worldwide</SelectItem>
+                      <SelectItem value="north-america">North America</SelectItem>
+                      <SelectItem value="europe">Europe</SelectItem>
+                      <SelectItem value="asia-pacific">Asia Pacific</SelectItem>
+                      <SelectItem value="latin-america">Latin America</SelectItem>
+                      <SelectItem value="middle-east-africa">Middle East & Africa</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import CartIcon from '@/components/CartIcon';
+import CartModal from '@/components/CartModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { mockCreators } from '@/data/mockData';
 import { Search, Filter, LogOut, User, Eye, ChevronDown } from 'lucide-react';
@@ -15,6 +17,7 @@ const BuyerCatalog = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [showCartModal, setShowCartModal] = useState(false);
 
   // Get all unique tags from creators
   const allTags = useMemo(() => {
@@ -107,6 +110,7 @@ const BuyerCatalog = () => {
               <span className="text-sm text-muted-foreground">
                 Welcome, {user?.name}
               </span>
+              <CartIcon onClick={() => setShowCartModal(true)} />
               <Button variant="ghost" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
@@ -267,6 +271,8 @@ const BuyerCatalog = () => {
           </div>
         )}
       </main>
+      
+      <CartModal isOpen={showCartModal} onClose={() => setShowCartModal(false)} />
     </div>
   );
 };

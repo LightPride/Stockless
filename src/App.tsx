@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { CartProvider } from "@/contexts/CartContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
@@ -19,38 +20,40 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<HomeRedirect />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/buyers" element={
-              <ProtectedRoute requiredRole="buyer">
-                <BuyerCatalog />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile/:id" element={
-              <ProtectedRoute requiredRole="buyer">
-                <CreatorGallery />
-              </ProtectedRoute>
-            } />
-            <Route path="/creator-dashboard/:id" element={
-              <ProtectedRoute requiredRole="creator">
-                <CreatorDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/checkout/success" element={
-              <ProtectedRoute>
-                <CheckoutSuccess />
-              </ProtectedRoute>
-            } />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <CartProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<HomeRedirect />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/buyers" element={
+                <ProtectedRoute requiredRole="buyer">
+                  <BuyerCatalog />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile/:id" element={
+                <ProtectedRoute requiredRole="buyer">
+                  <CreatorGallery />
+                </ProtectedRoute>
+              } />
+              <Route path="/creator-dashboard/:id" element={
+                <ProtectedRoute requiredRole="creator">
+                  <CreatorDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/checkout/success" element={
+                <ProtectedRoute>
+                  <CheckoutSuccess />
+                </ProtectedRoute>
+              } />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </CartProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
