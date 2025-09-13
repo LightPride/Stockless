@@ -71,7 +71,7 @@ const Landing = () => {
       {/* Hero Section */}
       <section className="py-24 px-6 bg-gradient-subtle relative overflow-hidden">
         {/* Ladder Photo Layout */}
-        <div className="absolute left-8 top-1/2 transform -translate-y-1/2 opacity-30">
+        <div className="absolute -left-20 top-1/2 transform -translate-y-1/2 opacity-30">
           {/* Main ladder */}
           <div className="flex flex-col space-y-4">
             {ladderPhotos.map((photo, index) => (
