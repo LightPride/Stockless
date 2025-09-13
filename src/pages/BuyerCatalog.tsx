@@ -167,22 +167,27 @@ const BuyerCatalog = () => {
             <Card key={creator.id} className="overflow-hidden hover:shadow-md smooth-transition group">
               <div className="relative h-64 overflow-hidden">
                 {/* Gallery preview grid */}
-                <div className="grid grid-cols-2 h-full">
+                <div className="grid grid-cols-2 h-full gap-0.5">
                   {creator.gallery.slice(0, 4).map((item, index) => (
                     <div 
                       key={item.id} 
-                      className={`relative overflow-hidden ${index >= 2 ? 'hidden' : ''}`}
+                      className="relative overflow-hidden"
                     >
                       <img
-                        src={item.thumbnail}
+                        src={item.thumb}
                         alt={`Preview ${index + 1}`}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     </div>
                   ))}
-                  {creator.gallery.length < 2 && (
+                  {creator.gallery.length === 1 && (
                     <div className="bg-muted flex items-center justify-center">
-                      <span className="text-muted-foreground text-sm">No content</span>
+                      <span className="text-muted-foreground text-sm">More content available</span>
+                    </div>
+                  )}
+                  {creator.gallery.length === 0 && (
+                    <div className="col-span-2 bg-muted flex items-center justify-center">
+                      <span className="text-muted-foreground text-sm">No content available</span>
                     </div>
                   )}
                 </div>
