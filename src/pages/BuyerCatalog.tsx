@@ -84,16 +84,16 @@ const BuyerCatalog = () => {
     }
   };
     return (
-      <div className="min-h-screen bg-gradient-subtle">
-      <header className="bg-white border-b border-border sticky top-0 z-50 shadow-soft">
+    <div className="min-h-screen bg-background">
+      <header className="bg-card border-b border-border sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
               <Link to="/" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-hero rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-hero rounded-sm flex items-center justify-center">
                   <span className="text-white font-bold text-lg">S</span>
                 </div>
-                <span className="text-xl font-bold">Stockless</span>
+                <span className="text-xl font-bold text-foreground">Stockless</span>
               </Link>
               <Badge variant="secondary" className="px-3 py-1">
                 <User className="w-3 h-3 mr-1" />
@@ -162,51 +162,53 @@ const BuyerCatalog = () => {
         </div>
 
         {/* Creator Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredCreators.map((creator) => (
-            <Card key={creator.id} className="overflow-hidden shadow-soft hover:shadow-medium smooth-transition border-0">
-              <div className="relative h-48 overflow-hidden">
+            <Card key={creator.id} className="overflow-hidden hover:shadow-md smooth-transition group">
+              <div className="relative h-64 overflow-hidden">
                 <img
                   src={creator.avatar}
                   alt={creator.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
-              </div>
-              
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-xl font-semibold">{creator.name}</h3>
-                  {creator.socialMediaConnected && (
-                    <Badge variant="success" className="text-xs">
-                      Connected
-                    </Badge>
-                  )}
-                </div>
-
-                <div className="mb-4">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                
+                {creator.socialMediaConnected && (
+                  <Badge variant="success" className="absolute top-3 right-3 text-xs">
+                    Connected
+                  </Badge>
+                )}
+                
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <h3 className="text-xl font-semibold text-white mb-2">{creator.name}</h3>
                   <div className="flex flex-wrap gap-1 mb-3">
-                    {creator.tags.map(tag => (
-                      <Badge key={tag} variant="outline" className="text-xs">
+                    {creator.tags.slice(0, 3).map(tag => (
+                      <Badge key={tag} variant="outline" className="text-xs bg-white/20 border-white/30 text-white">
                         {tag}
                       </Badge>
                     ))}
+                    {creator.tags.length > 3 && (
+                      <Badge variant="outline" className="text-xs bg-white/20 border-white/30 text-white">
+                        +{creator.tags.length - 3}
+                      </Badge>
+                    )}
                   </div>
                   
-                  {creator.restrictions.length > 0 && (
-                    <div className="text-xs text-muted-foreground">
-                      <span className="font-medium">Restrictions: </span>
-                      {creator.restrictions.join(', ')}
-                    </div>
-                  )}
+                  <Button asChild variant="cta" className="w-full">
+                    <Link to={`/profile/${creator.id}`}>
+                      <Eye className="w-4 h-4 mr-2" />
+                      View Gallery
+                    </Link>
+                  </Button>
                 </div>
+              </div>
 
-                <Button asChild variant="cta" className="w-full">
-                  <Link to={`/profile/${creator.id}`}>
-                    <Eye className="w-4 h-4 mr-2" />
-                    View Gallery
-                  </Link>
-                </Button>
-              </CardContent>
+              {creator.restrictions.length > 0 && (
+                <div className="p-3 bg-warning/10 text-xs text-muted-foreground border-t border-border">
+                  <span className="font-medium">Restrictions: </span>
+                  {creator.restrictions.join(', ')}
+                </div>
+              )}
             </Card>
           ))}
         </div>

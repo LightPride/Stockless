@@ -106,179 +106,207 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onC
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl">License Agreement</DialogTitle>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-card border-border">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-2xl font-bold text-foreground">License Agreement</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Selected Items */}
+        <div className="overflow-y-auto max-h-[calc(90vh-120px)] space-y-6 pr-2">
+          {/* Selected Items Grid */}
           <div>
-            <h3 className="font-semibold mb-3">Selected Content</h3>
-            <div className="grid grid-cols-4 gap-2 mb-3">
-              {selectedItems.slice(0, 8).map((item) => (
-                <img
-                  key={item.id}
-                  src={item.thumb}
-                  alt={item.caption}
-                  className="w-full h-16 object-cover rounded border"
-                />
+            <h3 className="font-semibold mb-4 text-foreground">Selected Content ({selectedItems.length} items)</h3>
+            <div className="grid grid-cols-6 md:grid-cols-8 gap-2 mb-4">
+              {selectedItems.slice(0, 16).map((item) => (
+                <div key={item.id} className="relative group">
+                  <img
+                    src={item.thumb}
+                    alt={item.caption}
+                    className="w-full aspect-square object-cover rounded-sm border border-border"
+                  />
+                </div>
               ))}
-              {selectedItems.length > 8 && (
-                <div className="w-full h-16 bg-muted rounded border flex items-center justify-center text-xs text-muted-foreground">
-                  +{selectedItems.length - 8} more
+              {selectedItems.length > 16 && (
+                <div className="w-full aspect-square bg-muted rounded-sm border border-border flex items-center justify-center text-xs text-muted-foreground font-medium">
+                  +{selectedItems.length - 16}
                 </div>
               )}
             </div>
-            <p className="text-sm text-muted-foreground">
-              {selectedItems.length} items from {creator.name}
-            </p>
-          </div>
-
-          {/* License Terms */}
-          <div className="space-y-4">
-            <h3 className="font-semibold">License Terms</h3>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="media-type">Media Type</Label>
-                <Select 
-                  value={licenseTerms.mediaType} 
-                  onValueChange={(value: 'Photo' | 'Video') => 
-                    setLicenseTerms(prev => ({ ...prev, mediaType: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Photo">Photo</SelectItem>
-                    <SelectItem value="Video">Video</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="duration">Duration</Label>
-                <Select 
-                  value={licenseTerms.duration} 
-                  onValueChange={(value) => 
-                    setLicenseTerms(prev => ({ ...prev, duration: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="3 months">3 months</SelectItem>
-                    <SelectItem value="6 months">6 months</SelectItem>
-                    <SelectItem value="12 months">12 months</SelectItem>
-                    <SelectItem value="24 months">24 months</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-center space-x-2 pt-6">
-                <Switch
-                  id="editing-rights"
-                  checked={licenseTerms.editingRights}
-                  onCheckedChange={(checked) => 
-                    setLicenseTerms(prev => ({ ...prev, editingRights: checked }))
-                  }
-                />
-                <Label htmlFor="editing-rights" className="text-sm">
-                  Editing rights included
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2 pt-6">
-                <Switch
-                  id="exclusivity"
-                  checked={licenseTerms.exclusivity}
-                  onCheckedChange={(checked) => 
-                    setLicenseTerms(prev => ({ ...prev, exclusivity: checked }))
-                  }
-                />
-                <Label htmlFor="exclusivity" className="text-sm">
-                  Exclusive rights
-                </Label>
-              </div>
-            </div>
-
-            {/* Restrictions Warning */}
-            {creator.restrictions.length > 0 && (
-              <div className="p-3 bg-warning/10 rounded-lg border border-warning/20">
-                <div className="flex items-center gap-2 text-sm">
-                  <Shield className="w-4 h-4 text-warning" />
-                  <span className="font-medium">Usage Restrictions Apply:</span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {creator.restrictions.join(', ')}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Price Summary */}
-          <div className="border-t pt-4">
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Base price ({selectedItems.length} items)</span>
-                <span>${selectedItems.length * 50}</span>
-              </div>
-              {licenseTerms.mediaType === 'Video' && (
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Video content</span>
-                  <span>+50%</span>
-                </div>
-              )}
-              {licenseTerms.editingRights && (
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Editing rights</span>
-                  <span>+30%</span>
-                </div>
-              )}
-              {licenseTerms.exclusivity && (
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Exclusive rights</span>
-                  <span>+100%</span>
-                </div>
-              )}
-              <div className="border-t pt-2">
-                <div className="flex justify-between text-lg font-semibold">
-                  <span>Total</span>
-                  <span>${price}</span>
-                </div>
-              </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>From:</span>
+              <span className="font-medium text-foreground">{creator.name}</span>
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex gap-3 pt-4">
-            <Button variant="outline" onClick={onClose} className="flex-1">
-              Cancel
-            </Button>
-            <Button 
-              variant="cta" 
-              onClick={handlePurchase} 
-              disabled={isProcessing}
-              className="flex-1"
-            >
-              {isProcessing ? (
-                <>Processing...</>
-              ) : (
-                <>
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  Purchase License - ${price}
-                </>
-              )}
-            </Button>
-          </div>
+          {/* License Configuration */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <h3 className="font-semibold text-foreground">License Configuration</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="media-type" className="text-sm font-medium text-foreground">Media Type</Label>
+                  <Select 
+                    value={licenseTerms.mediaType} 
+                    onValueChange={(value: 'Photo' | 'Video') => 
+                      setLicenseTerms(prev => ({ ...prev, mediaType: value }))
+                    }
+                  >
+                    <SelectTrigger className="bg-input border-border text-foreground">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border-border">
+                      <SelectItem value="Photo">Photo Content</SelectItem>
+                      <SelectItem value="Video">Video Content</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-          <p className="text-xs text-muted-foreground text-center">
-            This is a demo transaction. No actual payment will be processed.
-          </p>
+                <div>
+                  <Label htmlFor="duration" className="text-sm font-medium text-foreground">License Duration</Label>
+                  <Select 
+                    value={licenseTerms.duration} 
+                    onValueChange={(value) => 
+                      setLicenseTerms(prev => ({ ...prev, duration: value }))
+                    }
+                  >
+                    <SelectTrigger className="bg-input border-border text-foreground">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border-border">
+                      <SelectItem value="3 months">3 months</SelectItem>
+                      <SelectItem value="6 months">6 months</SelectItem>
+                      <SelectItem value="12 months">12 months</SelectItem>
+                      <SelectItem value="24 months">24 months</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-sm border border-border">
+                    <div>
+                      <Label htmlFor="editing-rights" className="text-sm font-medium text-foreground">
+                        Editing Rights
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Modify, crop, filter, and edit content
+                      </p>
+                    </div>
+                    <Switch
+                      id="editing-rights"
+                      checked={licenseTerms.editingRights}
+                      onCheckedChange={(checked) => 
+                        setLicenseTerms(prev => ({ ...prev, editingRights: checked }))
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-sm border border-border">
+                    <div>
+                      <Label htmlFor="exclusivity" className="text-sm font-medium text-foreground">
+                        Exclusive License
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Exclusive rights to this content
+                      </p>
+                    </div>
+                    <Switch
+                      id="exclusivity"
+                      checked={licenseTerms.exclusivity}
+                      onCheckedChange={(checked) => 
+                        setLicenseTerms(prev => ({ ...prev, exclusivity: checked }))
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Price Breakdown */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-foreground">Price Breakdown</h3>
+              <div className="bg-muted/30 rounded-sm p-4 border border-border">
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Base price ({selectedItems.length} items)</span>
+                    <span className="text-foreground font-medium">${selectedItems.length * 50}</span>
+                  </div>
+                  
+                  {licenseTerms.mediaType === 'Video' && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Video content (+50%)</span>
+                      <span className="text-foreground">+${Math.round(selectedItems.length * 50 * 0.5)}</span>
+                    </div>
+                  )}
+                  
+                  {licenseTerms.editingRights && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Editing rights (+30%)</span>
+                      <span className="text-foreground">+${Math.round(selectedItems.length * 50 * 0.3)}</span>
+                    </div>
+                  )}
+                  
+                  {licenseTerms.exclusivity && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Exclusive rights (+100%)</span>
+                      <span className="text-foreground">+${selectedItems.length * 50}</span>
+                    </div>
+                  )}
+                  
+                  <div className="border-t border-border pt-3">
+                    <div className="flex justify-between text-lg font-bold">
+                      <span className="text-foreground">Total</span>
+                      <span className="text-primary">${price}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Restrictions Warning */}
+              {creator.restrictions.length > 0 && (
+                <div className="p-3 bg-warning/10 rounded-sm border border-warning/20">
+                  <div className="flex items-start gap-2 text-sm">
+                    <Shield className="w-4 h-4 text-warning mt-0.5 flex-shrink-0" />
+                    <div>
+                      <span className="font-medium text-warning">Usage Restrictions Apply</span>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {creator.restrictions.join(', ')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
+
+        {/* Actions */}
+        <div className="flex gap-3 pt-4 border-t border-border">
+          <Button variant="outline" onClick={onClose} className="flex-1">
+            Cancel
+          </Button>
+          <Button 
+            variant="cta" 
+            onClick={handlePurchase} 
+            disabled={isProcessing}
+            className="flex-1"
+          >
+            {isProcessing ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
+                Processing...
+              </>
+            ) : (
+              <>
+                <CreditCard className="w-4 h-4 mr-2" />
+                Purchase License - ${price}
+              </>
+            )}
+          </Button>
+        </div>
+
+        <p className="text-xs text-muted-foreground text-center pt-2">
+          This is a demo transaction. No actual payment will be processed.
+        </p>
       </DialogContent>
     </Dialog>
   );

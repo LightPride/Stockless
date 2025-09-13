@@ -2,54 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Stockless Design System - Modern, Professional Content Licensing Platform */
+/* Stockless Design System - Music Vine Inspired Black Theme */
 
 @layer base {
   :root {
-    /* Core Brand Colors */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core Brand Colors - Black Theme */
+    --background: 0 0% 8%;
+    --foreground: 0 0% 98%;
     
-    /* Primary Estonian Blue Brand */
-    --primary: 206 90% 45%;
-    --primary-foreground: 0 0% 100%;
-    --primary-light: 206 90% 55%;
-    --primary-dark: 206 90% 35%;
+    /* Primary Brand - Bright Purple/Blue Accent */
+    --primary: 250 84% 54%;
+    --primary-foreground: 0 0% 98%;
+    --primary-light: 250 84% 64%;
+    --primary-dark: 250 84% 44%;
     
-    /* Secondary & Accent */
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --accent: 206 90% 45%;
-    --accent-foreground: 0 0% 100%;
+    /* Secondary & Accent - Dark Grays */
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 90%;
+    --accent: 250 84% 54%;
+    --accent-foreground: 0 0% 98%;
     
-    /* Muted Colors */
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
+    /* Muted Colors - Dark Theme */
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
     
-    /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)), hsl(210 100% 60%));
-    --gradient-card: linear-gradient(135deg, hsl(var(--primary)), hsl(210 100% 70%));
-    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(210 20% 98%));
+    /* Gradients - Dark Theme */
+    --gradient-hero: linear-gradient(135deg, hsl(250 84% 54%), hsl(260 84% 64%));
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 15%), hsl(0 0% 18%));
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 8%), hsl(0 0% 10%));
     
-    /* UI Elements */
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    /* UI Elements - Dark Theme */
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 95%;
+    --border: 0 0% 20%;
+    --input: 0 0% 15%;
     --ring: var(--primary);
     
-    /* Status Colors */
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --success: 142 76% 36%;
-    --success-foreground: 355 7% 97%;
-    --warning: 32 95% 44%;
-    --warning-foreground: 210 40% 98%;
+    /* Status Colors - Dark Theme Compatible */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 142 69% 58%;
+    --success-foreground: 0 0% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 98%;
     
-    /* Layout */
-    --radius: 0.75rem;
+    /* Layout - Minimal Rounded */
+    --radius: 0.125rem;
     --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     --shadow-large: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -59,24 +59,20 @@
     --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 262 83% 68%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 262 83% 68%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 262 83% 68%;
+  .light {
+    /* Light theme for special cases */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 5%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 5%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 5%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
   }
 }
 

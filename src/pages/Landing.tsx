@@ -1,23 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Shield, Zap, Users } from "lucide-react";
+import { ArrowRight, Shield, Zap, Users, Search, Image as ImageIcon, CreditCard, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Landing = () => {
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b border-border bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b border-border bg-card backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-hero rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-hero rounded-sm flex items-center justify-center">
                 <span className="text-white font-bold text-lg">S</span>
               </div>
               <span className="text-xl font-bold text-foreground">Stockless</span>
             </div>
             <div className="flex gap-4">
-              <Button variant="minimal" asChild>
+              <Button variant="ghost" asChild>
                 <Link to="/login">Login</Link>
               </Button>
               <Button variant="cta" asChild>
@@ -29,25 +29,24 @@ const Landing = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="py-24 px-6">
+      <section className="py-24 px-6 bg-gradient-subtle">
         <div className="container mx-auto text-center max-w-4xl">
-          <h1 className="text-5xl md:text-6xl font-bold mb-8 bg-gradient-hero bg-clip-text text-transparent">
-            License real content,
-            <br />
-            directly from creators
+          <h1 className="text-5xl md:text-6xl font-bold mb-8 text-foreground">
+            License content directly
+            <span className="block text-primary"> from creators</span>
           </h1>
           <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-            Find content. License it. Simple. Get authentic creator content with full protection - 
-            no direct contact needed, complete privacy for both parties.
+            Skip the stock photo sites. Get authentic, original content from real creators 
+            with transparent licensing and instant delivery.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <Button variant="hero" size="lg" asChild className="min-w-48">
+            <Button variant="cta" size="lg" asChild className="min-w-48">
               <Link to="/login?role=buyer">
                 I'm a Buyer <ArrowRight className="ml-2" />
               </Link>
             </Button>
-            <Button variant="creator" size="lg" asChild className="min-w-48">
+            <Button variant="outline" size="lg" asChild className="min-w-48">
               <Link to="/login?role=creator">
                 I'm a Creator <ArrowRight className="ml-2" />
               </Link>
@@ -57,15 +56,15 @@ const Landing = () => {
           {/* Trust indicators */}
           <div className="flex justify-center items-center gap-8 text-sm text-muted-foreground mb-20">
             <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4" />
+              <Shield className="w-4 h-4 text-success" />
               <span>Secure licensing</span>
             </div>
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4" />
+              <Zap className="w-4 h-4 text-primary" />
               <span>Instant delivery</span>
             </div>
             <div className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
+              <CheckCircle className="w-4 h-4 text-success" />
               <span>Double verification</span>
             </div>
           </div>
@@ -73,38 +72,43 @@ const Landing = () => {
       </section>
 
       {/* How it Works */}
-      <section className="py-20 px-6 bg-white">
+      <section className="py-20 px-6 bg-background">
         <div className="container mx-auto max-w-6xl">
-          <h2 className="text-3xl font-bold text-center mb-16">How Stockless Works</h2>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4 text-foreground">How Stockless Works</h2>
+            <p className="text-xl text-muted-foreground">
+              Three simple steps to get the content you need
+            </p>
+          </div>
           
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="p-8 text-center shadow-soft hover:shadow-medium smooth-transition border-0 bg-gradient-subtle">
-              <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-white font-bold text-lg">1</span>
+            <Card className="p-8 text-center bg-card border-border hover:shadow-md transition-all duration-200">
+              <div className="w-16 h-16 bg-primary/10 rounded-sm flex items-center justify-center mx-auto mb-6">
+                <Search className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-4">Browse Creators</h3>
+              <h3 className="text-xl font-semibold mb-4 text-foreground">Browse Creators</h3>
               <p className="text-muted-foreground">
-                Discover authentic content from verified creators. Filter by style, restrictions, and usage rights.
+                Discover verified creators and explore their private galleries of authentic content.
               </p>
             </Card>
 
-            <Card className="p-8 text-center shadow-soft hover:shadow-medium smooth-transition border-0 bg-gradient-subtle">
-              <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-white font-bold text-lg">2</span>
+            <Card className="p-8 text-center bg-card border-border hover:shadow-md transition-all duration-200">
+              <div className="w-16 h-16 bg-primary/10 rounded-sm flex items-center justify-center mx-auto mb-6">
+                <ImageIcon className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-4">Pick Content</h3>
+              <h3 className="text-xl font-semibold mb-4 text-foreground">Pick Content</h3>
               <p className="text-muted-foreground">
-                Select the perfect images or videos from private creator galleries. See usage restrictions upfront.
+                Select the images or videos you want and customize your licensing terms.
               </p>
             </Card>
 
-            <Card className="p-8 text-center shadow-soft hover:shadow-medium smooth-transition border-0 bg-gradient-subtle">
-              <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-white font-bold text-lg">3</span>
+            <Card className="p-8 text-center bg-card border-border hover:shadow-md transition-all duration-200">
+              <div className="w-16 h-16 bg-primary/10 rounded-sm flex items-center justify-center mx-auto mb-6">
+                <CreditCard className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-4">License Instantly</h3>
+              <h3 className="text-xl font-semibold mb-4 text-foreground">License Instantly</h3>
               <p className="text-muted-foreground">
-                AI-powered contracts, instant licensing, immediate download. Get what you need, when you need it.
+                Pay securely and get immediate access to high-resolution files and usage rights.
               </p>
             </Card>
           </div>
@@ -116,10 +120,10 @@ const Landing = () => {
         <div className="container mx-auto text-center max-w-3xl">
           <h2 className="text-4xl font-bold mb-6">Ready to get started?</h2>
           <p className="text-xl mb-10 text-white/90">
-            Join thousands of creators and brands using Stockless for authentic content licensing.
+            Join thousands of buyers and creators using Stockless for authentic content licensing.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="outline" size="lg" asChild className="bg-white text-primary hover:bg-white/90 border-white min-w-48">
+            <Button variant="secondary" size="lg" asChild className="min-w-48">
               <Link to="/login?role=buyer">Find Content</Link>
             </Button>
             <Button variant="outline" size="lg" asChild className="bg-transparent text-white border-white hover:bg-white/10 min-w-48">
@@ -130,16 +134,16 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 bg-background border-t">
+      <footer className="py-12 px-6 bg-card border-t border-border">
         <div className="container mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-6 h-6 bg-gradient-hero rounded flex items-center justify-center">
+            <div className="w-6 h-6 bg-gradient-hero rounded-sm flex items-center justify-center">
               <span className="text-white font-bold text-sm">S</span>
             </div>
-            <span className="font-semibold">Stockless</span>
+            <span className="font-semibold text-foreground">Stockless</span>
           </div>
           <p className="text-muted-foreground text-sm">
-            © 2024 Stockless. Connecting creators and TV producers through authentic content licensing.
+            © 2024 Stockless. Authentic content licensing made simple.
           </p>
         </div>
       </footer>
