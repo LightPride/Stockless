@@ -29,7 +29,7 @@ interface LicenseModalProps {
 }
 
 interface LicenseTerms {
-  mediaType: 'Photo' | 'Video';
+  mediaType: 'Photo/Video' | 'Other Media';
   editingRights: boolean;
   duration: string;
   exclusivity: boolean;
@@ -42,7 +42,7 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onC
   const [isProcessing, setIsProcessing] = useState(false);
   
   const [licenseTerms, setLicenseTerms] = useState<LicenseTerms>({
-    mediaType: 'Photo',
+    mediaType: 'Photo/Video',
     editingRights: false,
     duration: '12 months',
     exclusivity: false,
@@ -52,7 +52,7 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onC
   const calculatePrice = () => {
     let basePrice = selectedItems.length * 50; // $50 per item
     
-    if (licenseTerms.mediaType === 'Video') basePrice *= 1.5;
+    if (licenseTerms.mediaType === 'Other Media') basePrice *= 2;
     if (licenseTerms.editingRights) basePrice *= 1.3;
     if (licenseTerms.exclusivity) basePrice *= 2;
     
@@ -113,20 +113,54 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onC
           <DialogTitle className="text-2xl font-bold text-foreground">License Agreement</DialogTitle>
         </DialogHeader>
 
-        <div className="overflow-y-auto max-h-[calc(90vh-120px)] space-y-6 pr-2">
+        <div className="overflow-y-auto max-h-[calc(90vh-200px)] space-y-6 pr-2">
           {/* Selected Items Grid */}
           <div>
             <h3 className="font-semibold mb-4 text-foreground">Selected Content ({selectedItems.length} items)</h3>
             <div className="grid grid-cols-6 md:grid-cols-8 gap-2 mb-4">
-              {selectedItems.slice(0, 16).map((item) => (
-                <div key={item.id} className="relative group">
-                  <img
-                    src={item.thumb}
-                    alt={item.caption}
-                    className="w-full aspect-square object-cover rounded-sm border border-border"
-                  />
-                </div>
-              ))}
+              {selectedItems.slice(0, 16).map((item) => {
+                // Detect if this is a video by checking the permalink URL
+                const isVideo = item.permalink && (
+                  item.permalink.includes('.mp4') || 
+                  item.permalink.includes('video') ||
+                  item.permalink.includes('gtv-videos-bucket')
+                );
+                
+                return (
+                  <div key={item.id} className="relative group">
+                    {isVideo ? (
+                      <>
+                        <video
+                          src={item.permalink}
+                          className="w-full aspect-square object-cover rounded-sm border border-border"
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          onError={(e) => {
+                            // Fallback to thumbnail if video fails to load
+                            e.currentTarget.style.display = 'none';
+                            const img = e.currentTarget.nextElementSibling as HTMLImageElement;
+                            if (img) img.style.display = 'block';
+                          }}
+                        />
+                        <img
+                          src={item.thumb}
+                          alt={item.caption}
+                          className="w-full aspect-square object-cover rounded-sm border border-border"
+                          style={{ display: 'none' }}
+                        />
+                      </>
+                    ) : (
+                      <img
+                        src={item.thumb}
+                        alt={item.caption}
+                        className="w-full aspect-square object-cover rounded-sm border border-border"
+                      />
+                    )}
+                  </div>
+                );
+              })}
               {selectedItems.length > 16 && (
                 <div className="w-full aspect-square bg-muted rounded-sm border border-border flex items-center justify-center text-xs text-muted-foreground font-medium">
                   +{selectedItems.length - 16}
@@ -149,16 +183,16 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onC
                   <Label htmlFor="media-type" className="text-sm font-medium text-foreground">Media Type</Label>
                   <Select 
                     value={licenseTerms.mediaType} 
-                    onValueChange={(value: 'Photo' | 'Video') => 
+                    onValueChange={(value: 'Photo/Video' | 'Other Media') => 
                       setLicenseTerms(prev => ({ ...prev, mediaType: value }))
                     }
                   >
                     <SelectTrigger className="bg-input border-border text-foreground">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-popover border-border">
-                      <SelectItem value="Photo">Photo Content</SelectItem>
-                      <SelectItem value="Video">Video Content</SelectItem>
+                    <SelectContent className="bg-popover border-border z-50">
+                      <SelectItem value="Photo/Video">Photo/Video Content</SelectItem>
+                      <SelectItem value="Other Media">Other Media</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -174,7 +208,7 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onC
                     <SelectTrigger className="bg-input border-border text-foreground">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-popover border-border">
+                    <SelectContent className="bg-popover border-border z-50">
                       <SelectItem value="3 months">3 months</SelectItem>
                       <SelectItem value="6 months">6 months</SelectItem>
                       <SelectItem value="12 months">12 months</SelectItem>
@@ -194,7 +228,7 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onC
                     <SelectTrigger className="bg-input border-border text-foreground">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-popover border-border">
+                    <SelectContent className="bg-popover border-border z-50">
                       <SelectItem value="worldwide">Worldwide</SelectItem>
                       <SelectItem value="north-america">North America</SelectItem>
                       <SelectItem value="europe">Europe</SelectItem>
@@ -255,10 +289,10 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onC
                     <span className="text-foreground font-medium">${selectedItems.length * 50}</span>
                   </div>
                   
-                  {licenseTerms.mediaType === 'Video' && (
+                  {licenseTerms.mediaType === 'Other Media' && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Video content (+50%)</span>
-                      <span className="text-foreground">+${Math.round(selectedItems.length * 50 * 0.5)}</span>
+                      <span className="text-muted-foreground">Other media content (+100%)</span>
+                      <span className="text-foreground">+${selectedItems.length * 50}</span>
                     </div>
                   )}
                   
@@ -301,36 +335,36 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ creator, selectedItems, onC
               )}
             </div>
           </div>
-        </div>
+          
+          {/* Actions - Now inside scrollable area */}
+          <div className="flex gap-3 pt-4 border-t border-border">
+            <Button variant="outline" onClick={onClose} className="flex-1">
+              Cancel
+            </Button>
+            <Button 
+              variant="cta" 
+              onClick={handlePurchase} 
+              disabled={isProcessing}
+              className="flex-1"
+            >
+              {isProcessing ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Purchase License - ${price}
+                </>
+              )}
+            </Button>
+          </div>
 
-        {/* Actions */}
-        <div className="flex gap-3 pt-4 border-t border-border">
-          <Button variant="outline" onClick={onClose} className="flex-1">
-            Cancel
-          </Button>
-          <Button 
-            variant="cta" 
-            onClick={handlePurchase} 
-            disabled={isProcessing}
-            className="flex-1"
-          >
-            {isProcessing ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
-                Processing...
-              </>
-            ) : (
-              <>
-                <CreditCard className="w-4 h-4 mr-2" />
-                Purchase License - ${price}
-              </>
-            )}
-          </Button>
+          <p className="text-xs text-muted-foreground text-center pb-4">
+            This is a demo transaction. No actual payment will be processed.
+          </p>
         </div>
-
-        <p className="text-xs text-muted-foreground text-center pt-2">
-          This is a demo transaction. No actual payment will be processed.
-        </p>
       </DialogContent>
     </Dialog>
   );
