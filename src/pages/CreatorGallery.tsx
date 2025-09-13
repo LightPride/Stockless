@@ -74,6 +74,12 @@ const CreatorGallery = () => {
                   Back to Catalog
                 </Link>
               </Button>
+              <Link to="/" className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-white rounded-sm flex items-center justify-center">
+                  <span className="text-black font-bold text-lg">S</span>
+                </div>
+                <span className="text-xl font-bold text-foreground">Stockless</span>
+              </Link>
               <Badge variant="secondary" className="px-3 py-1">
                 <User className="w-3 h-3 mr-1" />
                 Buyer

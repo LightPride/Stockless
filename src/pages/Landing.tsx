@@ -56,7 +56,7 @@ const Landing = () => {
           {floatingPhotos.map((photo, index) => (
             <div
               key={index}
-              className={`absolute hover:scale-110 transition-transform duration-500 cursor-pointer ${
+              className={`absolute hover:scale-110 transition-all duration-500 cursor-pointer ${
                 index % 2 === 0 ? 'animate-float' : 'animate-float-delayed'
               }`}
               style={{
@@ -67,7 +67,7 @@ const Landing = () => {
               <img
                 src={photo.src}
                 alt={`Floating photo ${index + 1}`}
-                className="rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:rotate-2"
+                className="rounded-lg shadow-lg hover:shadow-2xl transition-all duration-500 hover:rotate-1"
               />
             </div>
           ))}
