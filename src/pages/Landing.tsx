@@ -116,7 +116,7 @@ const Landing = () => {
         <div className="container mx-auto text-center max-w-3xl">
           <h2 className="text-4xl font-bold mb-6">Ready to get started?</h2>
           <p className="text-xl mb-10 text-white/90">
-            Join thousands of creators and TV producers using Stockless for authentic content licensing.
+            Join thousands of creators and brands using Stockless for authentic content licensing.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="outline" size="lg" asChild className="bg-white text-primary hover:bg-white/90 border-white min-w-48">
@@ -139,7 +139,7 @@ const Landing = () => {
             <span className="font-semibold">Stockless</span>
           </div>
           <p className="text-muted-foreground text-sm">
-            © 2024 Stockless. Connecting creators and brands through authentic content licensing.
+            © 2024 Stockless. Connecting creators and TV producers through authentic content licensing.
           </p>
         </div>
       </footer>
