@@ -229,18 +229,34 @@ const BuyerCatalog = () => {
                 <div className="relative h-64 overflow-hidden">
                   {/* Gallery preview grid */}
                   <div className="grid grid-cols-2 h-full gap-0.5">
-                    {creator.sample_media?.slice(0, 4).map((thumb, index) => (
-                      <div 
-                        key={index} 
-                        className="relative overflow-hidden"
-                      >
-                        <img
-                          src={thumb}
-                          alt={`Preview ${index + 1}`}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                      </div>
-                    ))}
+                    {creator.sample_media?.slice(0, 4).map((thumb, index) => {
+                      // Check if this thumbnail is actually a video by looking for video file extensions or mixkit URLs
+                      const isVideo = typeof thumb === 'string' && (thumb.includes('mixkit') || thumb.includes('.mp4'));
+                      
+                      return (
+                        <div 
+                          key={index} 
+                          className="relative overflow-hidden"
+                        >
+                          {isVideo ? (
+                            <video
+                              src={thumb}
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              autoPlay
+                              loop
+                              muted
+                              playsInline
+                            />
+                          ) : (
+                            <img
+                              src={thumb}
+                              alt={`Preview ${index + 1}`}
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
                     {creator.media_count === 1 && (
                       <div className="bg-muted flex items-center justify-center">
                         <span className="text-muted-foreground text-sm">More content available</span>

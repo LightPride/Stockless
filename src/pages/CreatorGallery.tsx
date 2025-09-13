@@ -303,11 +303,22 @@ const CreatorGallery = () => {
               onClick={() => toggleMediaSelection(item.id)}
             >
               <div className="relative">
-                <img
-                  src={item.thumbnail_url}
-                  alt={item.caption || item.title || ''}
-                  className="w-full aspect-square object-cover transition-transform duration-200 group-hover:scale-105"
-                />
+                {item.media_type === 'video' ? (
+                  <video
+                    src={item.full_url}
+                    className="w-full aspect-square object-cover transition-transform duration-200 group-hover:scale-105"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                  />
+                ) : (
+                  <img
+                    src={item.thumbnail_url}
+                    alt={item.caption || item.title || ''}
+                    className="w-full aspect-square object-cover transition-transform duration-200 group-hover:scale-105"
+                  />
+                )}
                 
                 {/* Media Type Indicator */}
                 {item.media_type === 'video' && (
