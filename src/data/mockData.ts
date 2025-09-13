@@ -62,7 +62,7 @@ export const mockCreators: Creator[] = [
   {
     id: 'creator1',
     name: 'Alice Johnson',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face',
+    avatar: 'file:///Users/irynavynnyk/Desktop/2025-09-13%2008.55.41.jpg',
     tags: ['Sports', 'Nature', 'Adventure', 'Fitness', 'Outdoor'],
     restrictions: ['Not for alcohol', 'Not for political ads'],
     socialMediaConnected: true,
