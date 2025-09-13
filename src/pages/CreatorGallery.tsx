@@ -332,14 +332,31 @@ const CreatorGallery = () => {
                     loop
                     muted
                     playsInline
+                    controls={false}
+                    preload="metadata"
+                    onError={(e) => {
+                      // Fallback to thumbnail if video fails to load
+                      e.currentTarget.style.display = 'none';
+                      const img = e.currentTarget.nextElementSibling as HTMLImageElement;
+                      if (img) img.style.display = 'block';
+                    }}
+                    onLoadedData={(e) => {
+                      // Ensure video starts playing
+                      e.currentTarget.play().catch(() => {
+                        // If autoplay fails, show thumbnail instead
+                        e.currentTarget.style.display = 'none';
+                        const img = e.currentTarget.nextElementSibling as HTMLImageElement;
+                        if (img) img.style.display = 'block';
+                      });
+                    }}
                   />
-                ) : (
-                  <img
-                    src={item.thumbnail_url}
-                    alt={item.caption || item.title || ''}
-                    className="w-full aspect-square object-cover transition-transform duration-200 group-hover:scale-105"
-                  />
-                )}
+                ) : null}
+                <img
+                  src={item.media_type === 'video' ? item.thumbnail_url : item.thumbnail_url}
+                  alt={item.caption || item.title || ''}
+                  className="w-full aspect-square object-cover transition-transform duration-200 group-hover:scale-105"
+                  style={{ display: item.media_type === 'video' ? 'none' : 'block' }}
+                />
                 
                 {/* Media Type Indicator */}
                 {item.media_type === 'video' && (

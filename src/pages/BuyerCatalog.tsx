@@ -242,14 +242,39 @@ const BuyerCatalog = () => {
                           className="relative overflow-hidden"
                         >
                           {isVideo ? (
-                            <video
-                              src={item.full_url}
-                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                              autoPlay
-                              loop
-                              muted
-                              playsInline
-                            />
+                            <>
+                              <video
+                                src={item.full_url}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                                controls={false}
+                                preload="metadata"
+                                onError={(e) => {
+                                  // Fallback to thumbnail if video fails to load
+                                  e.currentTarget.style.display = 'none';
+                                  const img = e.currentTarget.nextElementSibling as HTMLImageElement;
+                                  if (img) img.style.display = 'block';
+                                }}
+                                onLoadedData={(e) => {
+                                  // Ensure video starts playing
+                                  e.currentTarget.play().catch(() => {
+                                    // If autoplay fails, show thumbnail instead
+                                    e.currentTarget.style.display = 'none';
+                                    const img = e.currentTarget.nextElementSibling as HTMLImageElement;
+                                    if (img) img.style.display = 'block';
+                                  });
+                                }}
+                              />
+                              <img
+                                src={item.thumbnail_url}
+                                alt={`Preview ${index + 1}`}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                style={{ display: 'none' }}
+                              />
+                            </>
                           ) : (
                             <img
                               src={item.thumbnail_url}
