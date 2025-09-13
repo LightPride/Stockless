@@ -17,6 +17,10 @@ import HomeRedirect from "@/components/HomeRedirect";
 
 const queryClient = new QueryClient();
 
+// Detect if we're on GitHub Pages
+const isGitHubPages = window.location.hostname.includes('github.io');
+const basename = isGitHubPages ? '/Stockless' : '';
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -24,7 +28,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
+          <BrowserRouter basename={basename}>
             <Routes>
               <Route path="/" element={<HomeRedirect />} />
               <Route path="/login" element={<Login />} />
