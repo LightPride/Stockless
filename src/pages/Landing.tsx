@@ -26,6 +26,7 @@ const Landing = () => {
     { src: 'https://images.unsplash.com/photo-1463100099107-aa0980c362e6?w=120&h=120&fit=crop' },
     { src: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=120&h=120&fit=crop' },
     { src: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=120&h=120&fit=crop' },
+    { src: 'https://images.unsplash.com/photo-1536431311719-398b6704d4cc?w=120&h=120&fit=crop' },
   ];
 
   const underLadderPhotos = [
@@ -35,13 +36,15 @@ const Landing = () => {
     { src: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=120&h=120&fit=crop' },
     { src: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=120&h=120&fit=crop' },
     { src: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop' },
+    { src: 'https://images.unsplash.com/photo-1542742436-5f0c71b3772?w=120&h=120&fit=crop' },
   ];
 
-  const fillerPhotos = [
-    { src: 'https://images.unsplash.com/photo-1536431311719-398b6704d4cc?w=120&h=120&fit=crop' },
+  const sidePhotos = [
     { src: 'https://images.unsplash.com/photo-1487260211189-670c54da558d?w=120&h=120&fit=crop' },
     { src: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=120&h=120&fit=crop' },
     { src: 'https://images.unsplash.com/photo-1515378791036-0648a814897e?w=120&h=120&fit=crop' },
+    { src: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&h=120&fit=crop' },
+    { src: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=120&h=120&fit=crop' },
   ];
 
   return (
@@ -71,9 +74,28 @@ const Landing = () => {
       {/* Hero Section */}
       <section className="py-24 px-6 bg-gradient-subtle relative overflow-hidden">
         {/* Ladder Photo Layout */}
-        <div className="absolute -left-20 top-1/2 transform -translate-y-1/2 opacity-30">
+        <div className="absolute left-8 top-1/2 transform -translate-y-1/2 opacity-30">
+          {/* Side photos - left column */}
+          <div className="absolute left-0 top-0 flex flex-col space-y-3">
+            {sidePhotos.map((photo, index) => (
+              <div
+                key={`side-${index}`}
+                className="transition-all duration-500 hover:scale-125 hover:opacity-100 hover:shadow-xl hover:z-10 relative cursor-pointer"
+                style={{
+                  marginTop: `${index * 45}px`
+                }}
+              >
+                <img
+                  src={photo.src}
+                  alt={`Side photo ${index + 1}`}
+                  className="w-16 h-16 rounded-lg shadow-lg object-cover hover:shadow-2xl"
+                />
+              </div>
+            ))}
+          </div>
+
           {/* Main ladder */}
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col space-y-4 ml-20">
             {ladderPhotos.map((photo, index) => (
               <div
                 key={index}
@@ -85,34 +107,14 @@ const Landing = () => {
                 <img
                   src={photo.src}
                   alt={`Gallery photo ${index + 1}`}
-                  className="w-24 h-24 rounded-lg shadow-lg hover:shadow-2xl object-cover"
-                />
-              </div>
-            ))}
-          </div>
-          
-          {/* Filler photos in between ladder steps */}
-          <div className="absolute top-16 left-12">
-            {fillerPhotos.map((photo, index) => (
-              <div
-                key={`filler-${index}`}
-                className="absolute transition-all duration-500 hover:scale-125 hover:opacity-100 hover:shadow-xl hover:z-10 cursor-pointer"
-                style={{
-                  top: `${index * 90 + 20}px`,
-                  left: `${index * 25 + 20}px`
-                }}
-              >
-                <img
-                  src={photo.src}
-                  alt={`Filler photo ${index + 1}`}
-                  className="w-16 h-16 rounded-lg shadow-lg object-cover opacity-60 hover:opacity-100"
+                  className="w-24 h-24 rounded-lg shadow-lg object-cover hover:shadow-2xl"
                 />
               </div>
             ))}
           </div>
           
           {/* Under ladder photos */}
-          <div className="flex flex-col space-y-3 mt-8">
+          <div className="flex flex-col space-y-3 mt-8 ml-20">
             {underLadderPhotos.map((photo, index) => (
               <div
                 key={`under-${index}`}
@@ -136,7 +138,7 @@ const Landing = () => {
             <span className="block text-primary"> from creators</span>
           </h1>
           <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-            Authentic videos and photos with transparent licencing and instant delivery.
+            Authentic videos and photos with transparent licencing and instant delivery
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
