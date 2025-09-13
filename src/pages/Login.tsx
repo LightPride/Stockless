@@ -112,11 +112,11 @@ const Login = () => {
   const fillDemoCredentials = (role: 'buyer' | 'creator') => {
     setSelectedRole(role);
     if (role === 'buyer') {
-      setEmail('buyer@demo.com');
-      setPassword('demo123');
+      setEmail('buyer@example.com');
+      setPassword('password123');
     } else {
-      setEmail('alice@demo.com');
-      setPassword('demo123');
+      setEmail('creator@example.com');
+      setPassword('password123');
     }
   };
 
@@ -253,7 +253,7 @@ const Login = () => {
                       className="w-full justify-start text-sm h-8"
                     >
                       <Users className="w-3 h-3 mr-2" />
-                      Buyer: buyer@demo.com
+                      Buyer: buyer@example.com
                     </Button>
                     <Button 
                       variant="ghost" 
@@ -262,7 +262,7 @@ const Login = () => {
                       className="w-full justify-start text-sm h-8"
                     >
                       <Camera className="w-3 h-3 mr-2" />
-                      Creator: alice@demo.com
+                      Creator: creator@example.com
                     </Button>
                   </div>
                 </div>
@@ -272,7 +272,7 @@ const Login = () => {
         </Card>
 
         <div className="text-center mt-6 text-sm text-muted-foreground">
-          <p>Demo app - Use any password with demo emails</p>
+          <p>Create a new account to test the app, or contact admin for demo access</p>
         </div>
       </div>
     </div>
