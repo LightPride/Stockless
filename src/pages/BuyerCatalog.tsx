@@ -206,12 +206,6 @@ const BuyerCatalog = () => {
                     </div>
                   )}
                 </div>
-                
-                {creator.socialMediaConnected && (
-                  <Badge variant="success" className="absolute top-3 right-3 text-xs">
-                    Connected
-                  </Badge>
-                )}
               </div>
 
               {/* Creator Info Section */}
