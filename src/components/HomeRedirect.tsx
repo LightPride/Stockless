@@ -8,7 +8,8 @@ const HomeRedirect: React.FC = () => {
 
   console.log('HomeRedirect - loading:', loading, 'isAuthenticated:', isAuthenticated, 'user:', user);
 
-  if (loading) {
+  // Wait for both loading to complete AND user data to be fully available
+  if (loading || (isAuthenticated && (!user || !user.id))) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
