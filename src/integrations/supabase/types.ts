@@ -41,6 +41,110 @@ export type Database = {
         }
         Relationships: []
       }
+      media_items: {
+        Row: {
+          caption: string | null
+          created_at: string | null
+          creator_id: string
+          dimensions: Json | null
+          duration: number | null
+          file_size: number | null
+          full_url: string
+          id: string
+          is_available: boolean | null
+          license_price: number | null
+          media_type: string
+          thumbnail_url: string
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string | null
+          creator_id: string
+          dimensions?: Json | null
+          duration?: number | null
+          file_size?: number | null
+          full_url: string
+          id?: string
+          is_available?: boolean | null
+          license_price?: number | null
+          media_type: string
+          thumbnail_url: string
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string | null
+          creator_id?: string
+          dimensions?: Json | null
+          duration?: number | null
+          file_size?: number | null
+          full_url?: string
+          id?: string
+          is_available?: boolean | null
+          license_price?: number | null
+          media_type?: string
+          thumbnail_url?: string
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_items_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          contract_signed: boolean | null
+          created_at: string | null
+          id: string
+          name: string
+          restrictions: string[] | null
+          role: string
+          social_media_connected: boolean | null
+          social_media_type: string | null
+          tags: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          contract_signed?: boolean | null
+          created_at?: string | null
+          id: string
+          name: string
+          restrictions?: string[] | null
+          role: string
+          social_media_connected?: boolean | null
+          social_media_type?: string | null
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          contract_signed?: boolean | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          restrictions?: string[] | null
+          role?: string
+          social_media_connected?: boolean | null
+          social_media_type?: string | null
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
