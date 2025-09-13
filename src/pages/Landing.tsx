@@ -26,6 +26,13 @@ const Landing = () => {
     { src: 'https://images.unsplash.com/photo-1463100099107-aa0980c362e6?w=120&h=120&fit=crop' },
   ];
 
+  const underLadderPhotos = [
+    { src: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=120&h=120&fit=crop' },
+    { src: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=120&h=120&fit=crop' },
+    { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=120&h=120&fit=crop' },
+    { src: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=120&h=120&fit=crop' },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -54,19 +61,39 @@ const Landing = () => {
       <section className="py-24 px-6 bg-gradient-subtle relative overflow-hidden">
         {/* Ladder Photo Layout */}
         <div className="absolute left-8 top-1/2 transform -translate-y-1/2 opacity-30">
+          {/* Main ladder */}
           <div className="flex flex-col space-y-4">
             {ladderPhotos.map((photo, index) => (
               <div
                 key={index}
                 className="transition-all duration-300 hover:scale-110 cursor-pointer"
                 style={{
-                  marginLeft: `${index * 20}px`
+                  marginLeft: `${index * 40}px`
                 }}
               >
                 <img
                   src={photo.src}
                   alt={`Gallery photo ${index + 1}`}
                   className="w-24 h-24 rounded-lg shadow-lg hover:shadow-2xl object-cover"
+                />
+              </div>
+            ))}
+          </div>
+          
+          {/* Under ladder photos */}
+          <div className="flex flex-col space-y-3 mt-8">
+            {underLadderPhotos.map((photo, index) => (
+              <div
+                key={`under-${index}`}
+                className="transition-all duration-300 hover:scale-110 cursor-pointer"
+                style={{
+                  marginLeft: `${(underLadderPhotos.length - index - 1) * 35}px`
+                }}
+              >
+                <img
+                  src={photo.src}
+                  alt={`Under ladder photo ${index + 1}`}
+                  className="w-20 h-20 rounded-lg shadow-lg hover:shadow-2xl object-cover opacity-80"
                 />
               </div>
             ))}
