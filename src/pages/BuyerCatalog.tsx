@@ -55,9 +55,17 @@ const BuyerCatalog = () => {
           return;
         }
 
-        // For each creator, get sample media items and count
+        // For each creator, get sample media items and total count
         const creatorsWithMedia = await Promise.all(
           profiles.map(async (profile) => {
+            // Get total count of media items
+            const { count: totalCount } = await supabase
+              .from('media_items')
+              .select('*', { count: 'exact', head: true })
+              .eq('creator_id', profile.id)
+              .eq('is_available', true);
+
+            // Get sample media items for preview (max 4)
             const { data: mediaItems } = await supabase
               .from('media_items')
               .select('thumbnail_url, media_type, full_url')
@@ -74,7 +82,7 @@ const BuyerCatalog = () => {
               restrictions: profile.restrictions || [],
               social_media_connected: profile.social_media_connected,
               contract_signed: profile.contract_signed,
-              media_count: mediaItems?.length || 0,
+              media_count: totalCount || 0,
               sample_media: mediaItems || []
             };
           })
